@@ -33,7 +33,9 @@ opt [label: User adds more metadata] {
 }
 
 User > Client: Accept User policy and estimated value
-Client > Azure Cognitive Service: Send data for validation
-Azure Cognitive Service > Azure Cognitive Service: JWT check (Clerk middleware) + Type validation 
-Azure Cognitive Service > Database: Store data in MongoDB
+
+Client > Article MicroService: Send data for validation
+
+Article MicroService > Article MicroService: JWT check (Clerk middleware) + Type validation 
+Article MicroService > Database: Store data in MongoDB
 
