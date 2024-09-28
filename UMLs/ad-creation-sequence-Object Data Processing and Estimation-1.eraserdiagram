@@ -1,0 +1,39 @@
+sequence-diagram
+
+// Title of the sequence diagram
+title Object Data Processing and Estimation
+
+// Define actors with icons and colors
+User [icon: user, color: blue]
+Client [icon: monitor, color: green]
+Cloudinary [icon: cloud, color: lightblue]
+AzureCognitiveService [icon: azure-cognitive-services, color: lightblue]
+DataikuModel [icon: tool, color: orange]
+ArticleMicroService [icon: server, color: purple]
+Database [icon: mongodb, color: red]
+
+// Sequence of interactions
+User > Client: Upload image
+Client > Cloudinary: Send buffer
+Cloudinary > Client: Return image URL
+Client > AzureCognitiveService: Send image URL for analysis
+AzureCognitiveService > Client: Return object type, brand, and model
+Client > DataikuModel: Send data for value estimation
+DataikuModel > Client: Return estimated value
+Client > User: Inform object data (type, brand, model, estimated value)
+
+opt [label: User changes data] {
+  User > Client: Update data
+  Client > DataikuModel: Re-estimate object
+  DataikuModel > Client: Return new estimated value
+}
+
+opt [label: User adds more metadata] {
+  User > Client: Ex. : Enter object dimensions
+}
+
+User > Client: Accept User policy and estimated value
+Client > ArticleMicroService: Send data for validation
+ArticleMicroService > ArticleMicroService: JWT check (Clerk middleware) + Type validation 
+ArticleMicroService > Database: Store data in MongoDB
+
