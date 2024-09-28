@@ -4,7 +4,7 @@ sequence-diagram
 title Object Data Processing and Estimation
 
 // Define actors with icons and colors
-User [icon: user, color: blue]
+User [icon: user, color: #71ff4a]
 Client [icon: monitor, color: green]
 Cloudinary [icon: cloud, color: lightblue]
 AzureCognitiveService [icon: azure-cognitive-services, color: lightblue]
