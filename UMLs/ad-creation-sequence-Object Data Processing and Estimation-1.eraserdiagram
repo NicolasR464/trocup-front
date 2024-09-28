@@ -7,25 +7,25 @@ title Object Data Processing and Estimation
 User [icon: user, color: #71ff4a]
 Client [icon: monitor, color: green]
 Cloudinary [icon: cloud, color: lightblue]
-AzureCognitiveService [icon: azure-cognitive-services, color: lightblue]
-DataikuModel [icon: tool, color: orange]
-ArticleMicroService [icon: server, color: purple]
+Azure Cognitive Service [icon: azure-cognitive-services, color: lightblue]
+Dataiku Model [icon: tool, color: orange]
+Article MicroService [icon: server, color: purple]
 Database [icon: mongodb, color: red]
 
 // Sequence of interactions
 User > Client: Upload image
 Client > Cloudinary: Send buffer
 Cloudinary > Client: Return image URL
-Client > AzureCognitiveService: Send image URL for analysis
-AzureCognitiveService > Client: Return object type, brand, and model
-Client > DataikuModel: Send data for value estimation
-DataikuModel > Client: Return estimated value
+Client > Azure Cognitive Service: Send image URL for analysis
+Azure Cognitive Service > Client: Return object type, brand, and model
+Client > Dataiku Model: Send data for value estimation
+Dataiku Model > Client: Return estimated value
 Client > User: Inform object data (type, brand, model, estimated value)
 
 opt [label: User changes data] {
   User > Client: Update data
-  Client > DataikuModel: Re-estimate object
-  DataikuModel > Client: Return new estimated value
+  Client > Dataiku Model: Re-estimate object
+  Dataiku Model > Client: Return new estimated value
 }
 
 opt [label: User adds more metadata] {
@@ -33,7 +33,7 @@ opt [label: User adds more metadata] {
 }
 
 User > Client: Accept User policy and estimated value
-Client > ArticleMicroService: Send data for validation
-ArticleMicroService > ArticleMicroService: JWT check (Clerk middleware) + Type validation 
-ArticleMicroService > Database: Store data in MongoDB
+Client > Azure Cognitive Service: Send data for validation
+Azure Cognitive Service > Azure Cognitive Service: JWT check (Clerk middleware) + Type validation 
+Azure Cognitive Service > Database: Store data in MongoDB
 
