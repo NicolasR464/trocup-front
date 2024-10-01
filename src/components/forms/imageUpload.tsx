@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 'use client'
 
+import { publicImgUpload } from '@/utils/apiCalls/thirdPartyApis/cloudinary'
 import React, { useMemo } from 'react'
 import type {
     DropEvent,
@@ -63,8 +64,12 @@ const StyledDropzone = (props: DropzoneInputProps): React.JSX.Element => {
     )
 }
 
-const onDrop = (drop: DropEvent): void => {
+const onDrop = async (drop: DropEvent): void => {
     console.log(drop)
+
+    const img = await publicImgUpload(drop[0])
+
+    console.log(img)
 }
 
 const ImageUpload = (): React.JSX.Element => {

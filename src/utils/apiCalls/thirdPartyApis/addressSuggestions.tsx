@@ -17,26 +17,26 @@ import axios from 'axios'
 export const getAddressSuggestions = async (
     input: string,
 ): Promise<AddressSuggestion[] | undefined> => {
-    const response = await axios.get(apiEndpoints.API_GOUV, {
+    const response = await axios.get<ApiGouvResponse>(apiEndpoints.API_GOUV, {
         params: {
             q: input,
             limit: 15,
         },
     })
 
-    const suggestions: AddressSuggestion[] = (
-        response.data as ApiGouvResponse
-    ).features.map((feature: ApiGouvFeature) => ({
-        properties: {
-            label: feature.properties.label,
-            housenumber: feature.properties.housenumber,
-            street: feature.properties.street,
-            city: feature.properties.city,
-            postcode: feature.properties.postcode,
-            citycode: feature.properties.citycode,
-            geopoints: feature.geometry,
-        },
-    }))
+    const suggestions: AddressSuggestion[] = response.data.features.map(
+        (feature: ApiGouvFeature) => ({
+            properties: {
+                label: feature.properties.label,
+                housenumber: feature.properties.housenumber,
+                street: feature.properties.street,
+                city: feature.properties.city,
+                postcode: feature.properties.postcode,
+                citycode: feature.properties.citycode,
+                geopoints: feature.geometry,
+            },
+        }),
+    )
 
     if (response.status !== 200)
         throw new Error('Address suggestions could not be fetched')
