@@ -1,3 +1,4 @@
+import { mainFolder, subfolders } from '@/utils/constants/images'
 import { apiEndpoints } from '../../constants/endpoints'
 
 export const publicImgUpload = async (
@@ -5,38 +6,39 @@ export const publicImgUpload = async (
 ): Promise<
     | {
           public_id: string
-          url: string
+          secure_url: string
       }
     | undefined
 > => {
     const cloudinaryForm = new FormData()
 
-    let folder = 'temp'
+    const subfolder =
+        process.env.NODE_ENV === 'development'
+            ? subfolders.development
+            : subfolders.production
 
-    if (process.env.NODE_ENV === 'development') folder = 'temp-dev'
     cloudinaryForm.append('file', img)
-    cloudinaryForm.append('folder', folder)
+    cloudinaryForm.append('folder', `${mainFolder}/${subfolder}`)
     cloudinaryForm.append('upload_preset', 'unsigned')
 
     const response = await fetch(apiEndpoints.CLOUDINARY, {
         method: 'POST',
         body: cloudinaryForm,
     })
-    console.log(response)
 
     //
     if (response.ok) {
         const {
             public_id,
-            url,
+            secure_url,
         }: {
             public_id: string
-            url: string
-        } = (await response.json()) as { public_id: string; url: string }
+            secure_url: string
+        } = (await response.json()) as { public_id: string; secure_url: string }
 
         return {
             public_id,
-            url,
+            secure_url,
         }
     }
 

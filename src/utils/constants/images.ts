@@ -12,3 +12,12 @@ export const trocUpLogos = {
             'https://res.cloudinary.com/etnaassets/image/upload/v1723194847/TROCUP_nobk_4x_izt0q3.png',
     },
 }
+
+// Cloudinary main folder
+export const mainFolder = 'trocup'
+
+// Cloudinary subfolders
+export const subfolders = {
+    production: 'production',
+    development: 'development',
+}
