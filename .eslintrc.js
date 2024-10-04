@@ -102,6 +102,7 @@ module.exports = {
         '@typescript-eslint/strict-boolean-expressions': 'off',
         '@typescript-eslint/no-floating-promises': 'off',
         '@typescript-eslint/promise-function-async': 'off',
+        '@typescript-eslint/ban-ts-comment': 'off',
         'import/first': 'error',
         'import/namespace': ['error', { allowComputed: true }],
         'import/newline-after-import': [

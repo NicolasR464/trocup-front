@@ -9,7 +9,7 @@ import axios from 'axios'
 export const createInstance = (baseURL: string): AxiosInstance => {
     const instance = axios.create({
         baseURL,
-        timeout: 10_000,
+        timeout: 40_000,
     })
     return instance
 }

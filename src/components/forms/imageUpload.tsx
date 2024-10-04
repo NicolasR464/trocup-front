@@ -4,21 +4,53 @@
 'use client'
 
 import { useState } from 'react'
-import type { DragTypes } from 'react-aria-components'
+import type { DragTypes, FileDropItem } from 'react-aria-components'
 import { DropZone } from 'react-aria-components'
-import type { DropEvent } from 'react-dropzone'
-
-import { publicImgUpload } from '@/utils/apiCalls/thirdPartyApis/cloudinary'
 import Image from 'next/image'
+
+import { useImageAnalysis } from '@/utils/apiCalls/local/mutations'
+
+import { Button } from '../shadcn/ui/button'
+
+const getImageBlob = async (data: FileDropItem): Promise<File> => {
+    const file = (await data.getFile()) as File
+    return file
+}
 
 const ImageUpload = (): React.JSX.Element => {
     const [dropped, setDropped] = useState(false)
     const [image, setImage] = useState<string>('')
     const [isDragging, setIsDragging] = useState(false)
+
+    const { mutateAsync, isPending } = useImageAnalysis()
+
+    // This state is used to track if the image has been loaded
     const [imageLoaded, setImageLoaded] = useState(false)
 
+    /**
+     * Is called when the user selects an image. The will reach the image analysis API.
+     * @param {File} file - The selected file to be uploaded.
+     */
+    const handleFileChange = async (file: File): Promise<void> => {
+        const imageUrl = URL.createObjectURL(file)
+
+        setImage(imageUrl)
+
+        await mutateAsync(
+            { file },
+            {
+                onSuccess: (data) => {
+                    console.log(data)
+                },
+                onError: (error) => {
+                    console.error(error)
+                },
+            },
+        )
+    }
+
     return (
-        <div className='flex h-full w-full items-center justify-center'>
+        <div className='flex w-full justify-center'>
             <DropZone
                 getDropOperation={(types: DragTypes) => {
                     if (
@@ -32,7 +64,7 @@ const ImageUpload = (): React.JSX.Element => {
 
                     return 'cancel'
                 }}
-                className={`flex h-full max-h-[1000px] min-h-[300px] w-2/3 min-w-[200px] items-center justify-center rounded-lg border-4 border-dashed border-gray-300 transition-colors duration-300 ${isDragging ? 'bg-green-200' : ''}`}
+                className={`flex max-h-[1000px] min-h-[300px] w-2/3 min-w-[200px] flex-col items-center justify-center rounded-lg border-4 border-dashed border-gray-300 transition-colors duration-300 ${isDragging ? 'bg-green-200' : ''}`}
                 onDropEnter={() => {
                     setIsDragging(true)
                 }}
@@ -42,38 +74,39 @@ const ImageUpload = (): React.JSX.Element => {
                 onDrop={async (event) => {
                     setIsDragging(false)
 
-                    console.log(event)
+                    const imageResult = await getImageBlob(
+                        event.items[0] as FileDropItem,
+                    )
 
-                    const imageFile = async (data) => {
-                        console.log({ data })
-
-                        const file = (await data.items[0].getFile()) as File
-                        return file
-                    }
-
-                    const imageResult = await imageFile(event)
-
-                    console.log(imageResult)
-
-                    if (imageResult) {
-                        publicImgUpload(imageResult)
-                            .then((response) => {
-                                console.log(
-                                    'Image uploaded successfully:',
-                                    response,
-                                )
-                                setImage(response.secure_url)
-                            })
-                            .catch((error) => {
-                                console.error('Error uploading image:', error)
-                            })
-                    }
+                    handleFileChange(imageResult)
 
                     setDropped(true)
                 }}
             >
-                <div>{!dropped && 'Drop image here'}</div>
+                <div>{!dropped && 'Dépose une image ici'}</div>
 
+                {/** Image selection window */}
+                <Button
+                    className='relative cursor-pointer'
+                    onClick={() => {
+                        // @ts-expect-error
+                        document.querySelector('#fileInput')?.click()
+                    }}
+                >
+                    <input
+                        id='fileInput'
+                        accept='image/*'
+                        type='file'
+                        className='absolute left-0 top-0 h-full w-full opacity-0'
+                        onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            if (file) handleFileChange(file)
+                        }}
+                    />
+                    <span className='relative z-10'>{'ou clique ici'}</span>
+                </Button>
+
+                {/** Uploaded image to display */}
                 {!!image && (
                     <Image
                         className='h-full w-full rounded-lg'

@@ -5,7 +5,7 @@ import { AddressSchema } from '@/types/address/userAddress'
 
 /**
  * Zod schema for user registration form validation.
- * @property {string} pseudo - User's pseudonym, 3-20 characters long.
+ * @property {string} pseudo - User's pseudonym, 3-50 characters long.
  * @property {string} avatarUrl - URL of the user's avatar image.
  * @property {string} [addressInput] - Optional user input for address.
  * @property {Address} [addressObject] - Optional structured address object.

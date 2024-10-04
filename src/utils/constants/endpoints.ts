@@ -4,9 +4,12 @@ export const apiEndpoints = {
     // Micro services
     USERS: 'api/users/',
     ARTICLES: 'api/articles/',
-    TRANSACTIONS: 'api/transaction/',
+    TRANSACTIONS: 'api/transactions/',
     /** @TODO Update the endpoint below  */
     INSTANT_MESSAGES: 'instantmsgs/',
+
+    // Local API endpoints
+    IMAGE_ANALYSIS: 'image-analysis/',
 
     // Third party APIs
     API_GOUV: 'https://api-adresse.data.gouv.fr/search/',

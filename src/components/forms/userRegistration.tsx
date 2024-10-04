@@ -318,9 +318,6 @@ export const RegistrationForm = (): React.JSX.Element => {
                     />
                 </div>
 
-                {/* {JSON.stringify(addressObject)}
-                {JSON.stringify(Object.keys(addressObject).length === 0)} */}
-
                 {/** User Address */}
                 <div className='flex justify-center'>
                     <FormField

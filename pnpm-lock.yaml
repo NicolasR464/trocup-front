@@ -11,6 +11,12 @@ importers:
       '@adobe/react-spectrum':
         specifier: 3.37.0
         version: 3.37.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@azure-rest/ai-vision-image-analysis':
+        specifier: 1.0.0-beta.3
+        version: 1.0.0-beta.3
+      '@azure/core-auth':
+        specifier: 1.8.0
+        version: 1.8.0
       '@clerk/nextjs':
         specifier: 5.4.1
         version: 5.4.1(next@14.2.6(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -89,9 +95,6 @@ importers:
       react-dom:
         specifier: ^18
         version: 18.3.1(react@18.3.1)
-      react-dropzone:
-        specifier: 14.2.3
-        version: 14.2.3(react@18.3.1)
       react-hook-form:
         specifier: 7.53.0
         version: 7.53.0(react@18.3.1)
@@ -256,6 +259,38 @@ packages:
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
+
+  '@azure-rest/ai-vision-image-analysis@1.0.0-beta.3':
+    resolution: {integrity: sha512-5eS9PsaJcXUmo1Zmlcw9vhlzjqk1FTOJpqN9odne5qbeSMgX3m4xCWuZAWtBOB6LbFCIa0XbqjYEdYBN4uTQmw==}
+    engines: {node: '>=18.0.0'}
+
+  '@azure-rest/core-client@1.4.0':
+    resolution: {integrity: sha512-ozTDPBVUDR5eOnMIwhggbnVmOrka4fXCs8n8mvUo4WLLc38kki6bAOByDoVZZPz/pZy2jMt2kwfpvy/UjALj6w==}
+    engines: {node: '>=18.0.0'}
+
+  '@azure/abort-controller@2.1.2':
+    resolution: {integrity: sha512-nBrLsEWm4J2u5LpAPjxADTlq3trDgVZZXHNKabeXZtpq3d3AbN/KGO82R87rdDz5/lYB024rtEf10/q0urNgsA==}
+    engines: {node: '>=18.0.0'}
+
+  '@azure/core-auth@1.8.0':
+    resolution: {integrity: sha512-YvFMowkXzLbXNM11yZtVLhUCmuG0ex7JKOH366ipjmHBhL3vpDcPAeWF+jf0X+jVXwFqo3UhsWUq4kH0ZPdu/g==}
+    engines: {node: '>=18.0.0'}
+
+  '@azure/core-rest-pipeline@1.17.0':
+    resolution: {integrity: sha512-62Vv8nC+uPId3j86XJ0WI+sBf0jlqTqPUFCBNrGtlaUeQUIXWV/D8GE5A1d+Qx8H7OQojn2WguC8kChD6v0shA==}
+    engines: {node: '>=18.0.0'}
+
+  '@azure/core-tracing@1.2.0':
+    resolution: {integrity: sha512-UKTiEJPkWcESPYJz3X5uKRYyOcJD+4nYph+KpfdPRnQJVrZfk0KJgdnaAWKfhsBBtAf/D58Az4AvCJEmWgIBAg==}
+    engines: {node: '>=18.0.0'}
+
+  '@azure/core-util@1.10.0':
+    resolution: {integrity: sha512-dqLWQsh9Nro1YQU+405POVtXnwrIVqPyfUzc4zXCbThTg7+vNNaiMkwbX9AMXKyoFYFClxmB3s25ZFr3+jZkww==}
+    engines: {node: '>=18.0.0'}
+
+  '@azure/logger@1.1.4':
+    resolution: {integrity: sha512-4IXXzcCdLdlXuCG+8UKEwLA1T1NHqUfanhXYHiQTn+6sfWCZXduqbtXDGceg3Ce5QxTGo7EqmbV6Bi+aqKuClQ==}
+    engines: {node: '>=18.0.0'}
 
   '@babel/code-frame@7.24.7':
     resolution: {integrity: sha512-BcYH1CVJBO9tvyIZ2jVeXgSIMvGZ2FDRvDdOIVQyuklNKSsx+eppDEBq/g47Ayw+RqNFE+URvOShmf+f/qwAlA==}
@@ -2547,6 +2582,10 @@ packages:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
     engines: {node: '>= 6.0.0'}
 
+  agent-base@7.1.1:
+    resolution: {integrity: sha512-H0TSyFNDMomMNJQBn8wFV5YC/2eJ+VXECwOadZJT554xP6cODZHPX3H9QMQECxvrgiSOP1pHjy1sMWQVYJOUOA==}
+    engines: {node: '>= 14'}
+
   aggregate-error@3.1.0:
     resolution: {integrity: sha512-4I7Td01quW/RpocfNayFdFVk1qSuoh0E7JrbRJ16nH01HhKFQ88INq9Sd+nd72zqRySlr9BmDA8xlEJ6vJMrYA==}
     engines: {node: '>=8'}
@@ -2660,10 +2699,6 @@ packages:
 
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
-
-  attr-accept@2.2.2:
-    resolution: {integrity: sha512-7prDjvt9HmqiZ0cl5CRjtS84sEyhsHP2coDkaZKRKVfCDo9s7iw7ChVmar78Gu9pC4SoR/28wFu/G5JJhTnqEg==}
-    engines: {node: '>=4'}
 
   available-typed-arrays@1.0.7:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
@@ -3374,10 +3409,6 @@ packages:
     resolution: {integrity: sha512-7Gps/XWymbLk2QLYK4NzpMOrYjMhdIxXuIvy2QBsLE6ljuodKvdkWs/cpyJJ3CVIVpH0Oi1Hvg1ovbMzLdFBBg==}
     engines: {node: ^10.12.0 || >=12.0.0}
 
-  file-selector@0.6.0:
-    resolution: {integrity: sha512-QlZ5yJC0VxHxQQsQhXvBaC7VRJ2uaxTf+Tfpu4Z/OcVQJVpZO+DGU0rkoVW5ce2SccxugvpBJoMvUs59iILYdw==}
-    engines: {node: '>= 12'}
-
   filelist@1.0.4:
     resolution: {integrity: sha512-w1cEuf3S+DrLCQL7ET6kz+gmlJdbq9J7yXCSjK/OZCPA+qEN1WyF4ZAf0YYJa4/shHJra2t/d/r8SV4Ji+x+8Q==}
 
@@ -3571,9 +3602,17 @@ packages:
     resolution: {integrity: sha512-n2hY8YdoRE1i7r6M0w9DIw5GgZN0G25P8zLCRQ8rjXtTU3vsNFBI/vWK/UIeE6g5MUUz6avwAPXmL6Fy9D/90w==}
     engines: {node: '>= 6'}
 
+  http-proxy-agent@7.0.2:
+    resolution: {integrity: sha512-T1gkAiYYDWYx3V5Bmyu7HcfcvL7mUrTWiM6yOfa3PIphViJ/gFPbvidQ+veqSOHci/PxBcDabeUNCzpOODJZig==}
+    engines: {node: '>= 14'}
+
   https-proxy-agent@5.0.1:
     resolution: {integrity: sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==}
     engines: {node: '>= 6'}
+
+  https-proxy-agent@7.0.5:
+    resolution: {integrity: sha512-1e4Wqeblerz+tMKPIq2EMGiiWW1dIjZOksyHWSUm1rmuvw/how9hBHZ38lAGj5ID4Ik6EdkOw7NmWPy6LAwalw==}
+    engines: {node: '>= 14'}
 
   human-signals@2.1.0:
     resolution: {integrity: sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==}
@@ -4536,12 +4575,6 @@ packages:
     peerDependencies:
       react: ^18.3.1
 
-  react-dropzone@14.2.3:
-    resolution: {integrity: sha512-O3om8I+PkFKbxCukfIR3QAGftYXDZfOE2N1mr/7qebQJHs7U+/RSL/9xomJNpRg9kM5h9soQSdf0Gc7OHF5Fug==}
-    engines: {node: '>= 10.13'}
-    peerDependencies:
-      react: '>= 16.8 || 18.0.0'
-
   react-hook-form@7.53.0:
     resolution: {integrity: sha512-M1n3HhqCww6S2hxLxciEXy2oISPnAzxY7gvwVPrtlczTM/1dDadXgUxDpHMrMTblDOcm/AXtXxHwZ3jpg1mqKQ==}
     engines: {node: '>=18.0.0'}
@@ -5380,6 +5413,63 @@ snapshots:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
+
+  '@azure-rest/ai-vision-image-analysis@1.0.0-beta.3':
+    dependencies:
+      '@azure-rest/core-client': 1.4.0
+      '@azure/core-auth': 1.8.0
+      '@azure/core-rest-pipeline': 1.17.0
+      '@azure/logger': 1.1.4
+      tslib: 2.7.0
+    transitivePeerDependencies:
+      - supports-color
+
+  '@azure-rest/core-client@1.4.0':
+    dependencies:
+      '@azure/abort-controller': 2.1.2
+      '@azure/core-auth': 1.8.0
+      '@azure/core-rest-pipeline': 1.17.0
+      '@azure/core-tracing': 1.2.0
+      '@azure/core-util': 1.10.0
+      tslib: 2.7.0
+    transitivePeerDependencies:
+      - supports-color
+
+  '@azure/abort-controller@2.1.2':
+    dependencies:
+      tslib: 2.7.0
+
+  '@azure/core-auth@1.8.0':
+    dependencies:
+      '@azure/abort-controller': 2.1.2
+      '@azure/core-util': 1.10.0
+      tslib: 2.7.0
+
+  '@azure/core-rest-pipeline@1.17.0':
+    dependencies:
+      '@azure/abort-controller': 2.1.2
+      '@azure/core-auth': 1.8.0
+      '@azure/core-tracing': 1.2.0
+      '@azure/core-util': 1.10.0
+      '@azure/logger': 1.1.4
+      http-proxy-agent: 7.0.2
+      https-proxy-agent: 7.0.5
+      tslib: 2.7.0
+    transitivePeerDependencies:
+      - supports-color
+
+  '@azure/core-tracing@1.2.0':
+    dependencies:
+      tslib: 2.7.0
+
+  '@azure/core-util@1.10.0':
+    dependencies:
+      '@azure/abort-controller': 2.1.2
+      tslib: 2.7.0
+
+  '@azure/logger@1.1.4':
+    dependencies:
+      tslib: 2.7.0
 
   '@babel/code-frame@7.24.7':
     dependencies:
@@ -8836,6 +8926,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  agent-base@7.1.1:
+    dependencies:
+      debug: 4.3.7
+    transitivePeerDependencies:
+      - supports-color
+
   aggregate-error@3.1.0:
     dependencies:
       clean-stack: 2.2.0
@@ -8971,8 +9067,6 @@ snapshots:
   async@3.2.6: {}
 
   asynckit@0.4.0: {}
-
-  attr-accept@2.2.2: {}
 
   available-typed-arrays@1.0.7:
     dependencies:
@@ -9371,7 +9465,7 @@ snapshots:
   dot-case@3.0.4:
     dependencies:
       no-case: 3.0.4
-      tslib: 2.4.1
+      tslib: 2.7.0
 
   eastasianwidth@0.2.0: {}
 
@@ -9917,10 +10011,6 @@ snapshots:
     dependencies:
       flat-cache: 3.2.0
 
-  file-selector@0.6.0:
-    dependencies:
-      tslib: 2.7.0
-
   filelist@1.0.4:
     dependencies:
       minimatch: 5.1.6
@@ -10116,9 +10206,23 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  http-proxy-agent@7.0.2:
+    dependencies:
+      agent-base: 7.1.1
+      debug: 4.3.7
+    transitivePeerDependencies:
+      - supports-color
+
   https-proxy-agent@5.0.1:
     dependencies:
       agent-base: 6.0.2
+      debug: 4.3.7
+    transitivePeerDependencies:
+      - supports-color
+
+  https-proxy-agent@7.0.5:
+    dependencies:
+      agent-base: 7.1.1
       debug: 4.3.7
     transitivePeerDependencies:
       - supports-color
@@ -10830,7 +10934,7 @@ snapshots:
 
   lower-case@2.0.2:
     dependencies:
-      tslib: 2.4.1
+      tslib: 2.7.0
 
   lru-cache@10.4.3: {}
 
@@ -10935,7 +11039,7 @@ snapshots:
   no-case@3.0.4:
     dependencies:
       lower-case: 2.0.2
-      tslib: 2.4.1
+      tslib: 2.7.0
 
   node-int64@0.4.0: {}
 
@@ -11279,13 +11383,6 @@ snapshots:
       react: 18.3.1
       scheduler: 0.23.2
 
-  react-dropzone@14.2.3(react@18.3.1):
-    dependencies:
-      attr-accept: 2.2.2
-      file-selector: 0.6.0
-      prop-types: 15.8.1
-      react: 18.3.1
-
   react-hook-form@7.53.0(react@18.3.1):
     dependencies:
       react: 18.3.1
@@ -11550,7 +11647,7 @@ snapshots:
   snake-case@3.0.4:
     dependencies:
       dot-case: 3.0.4
-      tslib: 2.4.1
+      tslib: 2.7.0
 
   snakecase-keys@5.4.4:
     dependencies:

@@ -14,7 +14,7 @@ Database [icon: mongodb, color: red]
 
 // Sequence of interactions
 User > Client: Upload image
-Client > Cloudinary: Send buffer
+Client > Cloudinary: Send image
 Cloudinary > Client: Return image URL
 Client > Azure Cognitive Service: Send image URL for analysis
 Azure Cognitive Service > Client: Return object type, brand, and model
