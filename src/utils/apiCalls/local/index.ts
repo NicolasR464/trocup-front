@@ -3,14 +3,15 @@ import { apiEndpoints } from '@/utils/constants/endpoints'
 
 import type { AxiosResponse } from 'axios'
 
-type ImageAnalysisSuccess = {
+export type ImageAnalysisSuccess = {
     message: string
-    data: {
-        public_id: string
-        secure_url: string
+    content: {
+        brand: string
+        tags: string[]
+        objectIdentified: string
     }
 }
-type ImageAnalysisError = {
+export type ImageAnalysisError = {
     error: string
 }
 

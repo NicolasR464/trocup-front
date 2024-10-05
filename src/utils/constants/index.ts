@@ -19,8 +19,9 @@ export const pagePaths = {
     ONBOARDING: '/onboarding/',
 }
 
+/** Object containing notifications to the user for various cases, set in alphabetical order */
 export const userMessages = {
-    onboardingSuccess: 'Tes informations ont été sauvegardées',
     onboardingError:
         'Erreur de sauvegarde de tes informations. Réessaye plus tard.',
+    onboardingSuccess: 'Tes informations ont été sauvegardées',
 }

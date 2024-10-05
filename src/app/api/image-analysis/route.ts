@@ -1,6 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-confusing-void-expression */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
+import type { ImageAnalysisSuccess } from '@/utils/apiCalls/local'
 import { apiEndpoints } from '@/utils/constants/endpoints'
 import { mainFolder, subfolders } from '@/utils/constants/images'
 
@@ -9,12 +15,8 @@ import { environment } from '@/types/environment'
 
 import { AzureKeyCredential } from '@azure/core-auth'
 import type {
-    CropRegionOutput,
-    DenseCaptionOutput,
-    DetectedObjectOutput,
-    DetectedPersonOutput,
-    DetectedTagOutput,
-    DetectedTextBlockOutput,
+    AnalyzeFromUrl200Response,
+    AnalyzeFromUrlDefaultResponse,
     ImageAnalysisClient,
 } from '@azure-rest/ai-vision-image-analysis'
 import createImageAnalysisClient, {
@@ -26,16 +28,14 @@ const analyzeImageFromUrl = async (
     client: ImageAnalysisClient,
     imageUrl: string,
     features: string[],
-): Promise<void> => {
-    const result: { data: any } = await client
-        .path('/imageanalysis:analyze')
-        .post({
+): Promise<ImageAnalysisSuccess> => {
+    const result: AnalyzeFromUrl200Response | AnalyzeFromUrlDefaultResponse =
+        await client.path('/imageanalysis:analyze').post({
             body: {
                 url: imageUrl,
             },
             queryParameters: {
-                features: features,
-                'smartCrops-aspect-ratios': [0.9, 1.33],
+                features,
             },
             contentType: 'application/json',
         })
@@ -44,41 +44,57 @@ const analyzeImageFromUrl = async (
         throw result.body.error
     }
 
+    let brand = ''
+    let objectIdentified = ''
+    let tags: string[] = []
     console.log(`Model Version: ${result.body.modelVersion}`)
+
     console.log(`Image Metadata: ${JSON.stringify(result.body.metadata)}`)
-    if (result.body.captionResult)
-        console.log(
-            `Caption: ${result.body.captionResult.text} (confidence: ${result.body.captionResult.confidence})`,
-        )
-    if (result.body.denseCaptionsResult)
-        result.body.denseCaptionsResult.values.forEach(
-            (denseCaption: DenseCaptionOutput) =>
-                console.log(`Dense Caption: ${JSON.stringify(denseCaption)}`),
-        )
-    if (result.body.objectsResult)
-        result.body.objectsResult.values.forEach(
-            (object: DetectedObjectOutput) =>
-                console.log(`Object: ${JSON.stringify(object)}`),
-        )
-    if (result.body.peopleResult)
-        result.body.peopleResult.values.forEach(
-            (person: DetectedPersonOutput) =>
-                console.log(`Person: ${JSON.stringify(person)}`),
-        )
-    if (result.body.readResult)
-        result.body.readResult.blocks.forEach(
-            (block: DetectedTextBlockOutput) =>
-                console.log(`Text Block: ${JSON.stringify(block)}`),
-        )
-    if (result.body.smartCropsResult)
-        result.body.smartCropsResult.values.forEach(
-            (smartCrop: CropRegionOutput) =>
-                console.log(`Smart Crop: ${JSON.stringify(smartCrop)}`),
-        )
-    if (result.body.tagsResult)
-        result.body.tagsResult.values.forEach((tag: DetectedTagOutput) =>
-            console.log(`Tag: ${JSON.stringify(tag)}`),
-        )
+
+    // Identify the object name
+    if (
+        result.body.objectsResult &&
+        result.body.objectsResult.values.length > 0
+    ) {
+        const objects = result.body.objectsResult.values
+        let highestConfidenceObject = undefined
+
+        console.log('🚀 ~ objects:')
+        console.log(objects)
+
+        for (const object of objects) {
+            highestConfidenceObject =
+                highestConfidenceObject &&
+                object.tags[0].confidence >
+                    highestConfidenceObject.tags[0].confidence
+                    ? object
+                    : object
+        }
+
+        objectIdentified = highestConfidenceObject.tags[0].name
+    }
+
+    // Read the text from the image - and extract the brand name
+    if (result.body.readResult && result.body.readResult.blocks.length > 0) {
+        brand = result.body.readResult.blocks[0].lines[0].text
+    }
+
+    if (result.body.tagsResult) {
+        for (let index = 0; index <= 3; index++) {
+            tags.push(result.body.tagsResult.values[index].name)
+        }
+    }
+
+    const objectData = {
+        brand,
+        objectIdentified,
+        tags,
+    }
+
+    return {
+        message: 'Image analyzed successfully',
+        content: objectData,
+    }
 }
 
 export const POST = async (request: NextRequest): Promise<NextResponse> => {
@@ -118,31 +134,31 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 
     const imageData = response.data as CloudinaryResponse
 
-    // return NextResponse.json({
-    //     message: 'Image uploaded successfully',
-    //     data: imageData,
-    // })
+    console.log('✅ Cloudinary')
 
-    // STEP#2 : Analyze the image 🔥
+    // STEP#2 : Analyze the image with Azure Cognitive Services 🔥
 
-    const endpoint: string = environment.AZURE_COGNITIVE_SERVICES_ENDPOINT
-    const key: string = environment.AZURE_COGNITIVE_SERVICES_KEY
-    const credential = new AzureKeyCredential(key)
+    const azureEndpoint: string = environment.AZURE_COGNITIVE_SERVICES_ENDPOINT
+    const azureKey: string = environment.AZURE_COGNITIVE_SERVICES_KEY
+    const azureCredential = new AzureKeyCredential(azureKey)
 
-    const client: ImageAnalysisClient = createImageAnalysisClient(
-        endpoint,
-        credential,
+    const azureClient: ImageAnalysisClient = createImageAnalysisClient(
+        azureEndpoint,
+        azureCredential,
     )
 
-    const features: string[] = [
-        'Caption',
-        'DenseCaptions',
-        'Objects',
-        'People',
-        'Read',
-        'SmartCrops',
-        'Tags',
-    ]
+    const azureFeatures: string[] = ['Objects', 'Read', 'Tags']
 
-    await analyzeImageFromUrl(client, imageData.secure_url, features)
+    const azureAnalysis = await analyzeImageFromUrl(
+        azureClient,
+        imageData.secure_url,
+        azureFeatures,
+    )
+
+    return NextResponse.json({
+        message: 'Image analyzed successfully',
+        data: azureAnalysis,
+    })
+
+    // STEP#3 : Send the data to Dataiku (To do on an other ticket)
 }

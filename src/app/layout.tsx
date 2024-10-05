@@ -29,7 +29,10 @@ const Layout = ({
 }: Readonly<{
     children: React.ReactNode
 }>): React.JSX.Element => (
-    <ClerkProvider>
+    <ClerkProvider
+        signUpFallbackRedirectUrl={pagePaths.ONBOARDING}
+        afterSignOutUrl={pagePaths.HOME}
+    >
         <html lang='en'>
             <body className={inter.className}>
                 <ReactQueryProvider>

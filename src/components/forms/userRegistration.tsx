@@ -156,7 +156,6 @@ export const RegistrationForm = (): React.JSX.Element => {
             avatarUrl,
             pseudo: pseudo.trim(),
             ...(addressObject && { address: addressObject }),
-            createdAt: new Date().toISOString(),
         }
 
         await mutateAsync(
@@ -260,13 +259,15 @@ export const RegistrationForm = (): React.JSX.Element => {
 
                         {/** Change Avatar Button */}
                         <TooltipProvider>
-                            <Tooltip>
+                            <Tooltip delayDuration={500}>
                                 <TooltipTrigger asChild>
                                     <Button
                                         className='mt-1'
                                         disabled={!imageLoaded}
                                         type='button'
                                         onClick={() => {
+                                            setImageLoaded(false)
+
                                             setValue(
                                                 'avatarUrl',
                                                 getRandomAvatarUrl(),

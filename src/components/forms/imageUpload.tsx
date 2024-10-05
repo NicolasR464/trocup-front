@@ -11,6 +11,10 @@ import Image from 'next/image'
 import { useImageAnalysis } from '@/utils/apiCalls/local/mutations'
 
 import { Button } from '../shadcn/ui/button'
+import {
+    ImageAnalysisResponse,
+    ImageAnalysisSuccess,
+} from '@/utils/apiCalls/local'
 
 const getImageBlob = async (data: FileDropItem): Promise<File> => {
     const file = (await data.getFile()) as File
@@ -21,6 +25,9 @@ const ImageUpload = (): React.JSX.Element => {
     const [dropped, setDropped] = useState(false)
     const [image, setImage] = useState<string>('')
     const [isDragging, setIsDragging] = useState(false)
+    const [objectData, setObjectData] = useState<
+        ImageAnalysisSuccess | undefined
+    >()
 
     const { mutateAsync, isPending } = useImageAnalysis()
 
@@ -39,8 +46,13 @@ const ImageUpload = (): React.JSX.Element => {
         await mutateAsync(
             { file },
             {
-                onSuccess: (data) => {
+                onSuccess: ({ data }) => {
+                    console.log('🚀 ~ onSuccess ~ data:')
                     console.log(data)
+                    if ('content' in data) {
+                        console.log(data.content)
+                        setObjectData(data)
+                    }
                 },
                 onError: (error) => {
                     console.error(error)
@@ -50,7 +62,7 @@ const ImageUpload = (): React.JSX.Element => {
     }
 
     return (
-        <div className='flex w-full justify-center'>
+        <div className='flex w-full flex-col items-center justify-center'>
             <DropZone
                 getDropOperation={(types: DragTypes) => {
                     if (
@@ -86,25 +98,27 @@ const ImageUpload = (): React.JSX.Element => {
                 <div>{!dropped && 'Dépose une image ici'}</div>
 
                 {/** Image selection window */}
-                <Button
-                    className='relative cursor-pointer'
-                    onClick={() => {
-                        // @ts-expect-error
-                        document.querySelector('#fileInput')?.click()
-                    }}
-                >
-                    <input
-                        id='fileInput'
-                        accept='image/*'
-                        type='file'
-                        className='absolute left-0 top-0 h-full w-full opacity-0'
-                        onChange={(e) => {
-                            const file = e.target.files?.[0]
-                            if (file) handleFileChange(file)
+                {!imageLoaded && (
+                    <Button
+                        className='relative cursor-pointer'
+                        onClick={() => {
+                            // @ts-expect-error
+                            document.querySelector('#fileInput')?.click()
                         }}
-                    />
-                    <span className='relative z-10'>{'ou clique ici'}</span>
-                </Button>
+                    >
+                        <input
+                            id='fileInput'
+                            accept='image/*'
+                            type='file'
+                            className='absolute left-0 top-0 h-full w-full opacity-0'
+                            onChange={(e) => {
+                                const file = e.target.files?.[0]
+                                if (file) handleFileChange(file)
+                            }}
+                        />
+                        <span className='relative z-10'>{'ou clique ici'}</span>
+                    </Button>
+                )}
 
                 {/** Uploaded image to display */}
                 {!!image && (
@@ -121,6 +135,14 @@ const ImageUpload = (): React.JSX.Element => {
                     />
                 )}
             </DropZone>
+
+            {!!objectData && (
+                <div>
+                    <p>Object: {objectData.content.objectIdentified}</p>
+                    <p>Brand: {objectData.content.brand}</p>
+                    <p>Tags: {objectData.content.tags.join(', ')}</p>
+                </div>
+            )}
         </div>
     )
 }
