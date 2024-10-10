@@ -584,7 +584,7 @@ const ArticleForm = (): React.JSX.Element => {
                     type='submit'
                     className='w-full md:w-auto'
                 >
-                    {'Créer l’annonce'}
+                    {'Estimer l’article'}
                 </Button>
             </form>
         </Form>

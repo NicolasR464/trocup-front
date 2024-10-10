@@ -109,6 +109,7 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
         return (
             <div className='relative inline-flex h-8 w-24 rounded-md border border-input'>
                 <Input
+                    min={0}
                     type='number'
                     value={value?.toString() ?? ''}
                     onChange={handleChange}
@@ -120,22 +121,6 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
                     ref={inputRef}
                     {...props}
                 />
-                <div className='flex h-full w-5 flex-col border-l border-input'>
-                    <button
-                        type='button'
-                        className='flex flex-1 items-center justify-center border-b border-input text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                        onClick={() => handleStep('up')}
-                    >
-                        <ChevronUp className='h-3 w-3' />
-                    </button>
-                    <button
-                        type='button'
-                        className='flex flex-1 items-center justify-center text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                        onClick={() => handleStep('down')}
-                    >
-                        <ChevronDown className='h-3 w-3' />
-                    </button>
-                </div>
             </div>
         )
     },
