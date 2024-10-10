@@ -16,6 +16,10 @@ type UserStore = {
     setUserData: (userData: Partial<UserData>) => void
 }
 
+/**
+ * This store is used to manage user data, including pseudo, avatarUrl, isPremium status, and address.
+ * It provides a method to update the user data partially.
+ */
 export const useUserStore = create<UserStore>()(
     persist(
         immer((set) => ({

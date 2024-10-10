@@ -1,22 +1,6 @@
 import { z } from 'zod'
 
-import { categories } from './categories'
-
-/**
- * @description Schema for category enum
- * @exports CategoryEnumSchema
- */
-export const CategoryEnumSchema = z.enum(
-    Object.keys(categories) as [keyof typeof categories],
-)
-
-/**
- * @description Schema for subcategory enum
- * @exports SubcategoryEnumSchema
- */
-export const SubcategoryEnumSchema = z.enum(
-    Object.values(categories).flat() as [string],
-)
+import { CategoryEnumSchema, SubcategoryEnumSchema } from './categories'
 
 /**
  * @description Schema for dimensions
@@ -34,28 +18,87 @@ export const DimensionsSchema = z.object({
  * @exports StateSchema
  */
 export const StateSchema = z.enum([
-    'Neuf',
-    'Comme neuf',
-    'Très bon état',
-    'Bon état',
-    'État correct',
-    'À réparer',
+    'NEW',
+    'LIKE_NEW',
+    'VERY_GOOD_CONDITION',
+    'GOOD_CONDITION',
+    'FAIR_CONDITION',
+    'TO_REPAIR',
 ])
 
 /**
- * @description Schema for status enum
+ * @description Schema defining the availability of the article
  * @exports StatusSchema
  */
-export const StatusSchema = z.enum(['Accessible', 'Inaccessible'])
+export const StatusSchema = z.enum(['AVAILABLE', 'UNAVAILABLE', 'RESERVED'])
 
 /**
  * @description Schema for delivery type enum
  * @exports DeliveryTypeSchema
  */
-export const DeliveryTypeSchema = z.enum([
-    'La Poste',
-    'Mondial Relay',
-    'En main propre',
+export const DeliveryTypeSchema = z.enum(['PICKUP', 'SHIPPING', 'BOTH'])
+
+/**
+ * @description Schema for garment size enum
+ * @exports GarmentSizeSchema
+ */
+export const GarmentSizeSchema = z.enum(['XS', 'S', 'M', 'L', 'XL', 'XXL'])
+
+/**
+ * @description Schema for shoe size enum
+ * @exports ShoeSizeSchema
+ */
+export const ShoeSizeSchema = z.enum([
+    '35',
+    '36',
+    '37',
+    '38',
+    '39',
+    '40',
+    '41',
+    '42',
+    '43',
+    '44',
+    '45',
+    '46',
+])
+
+/**
+ * @description Schema for bra size enum
+ * @exports BraSizeSchema
+ */
+export const BraSizeSchema = z.enum([
+    '70A',
+    '70B',
+    '70C',
+    '70D',
+    '75A',
+    '75B',
+    '75C',
+    '75D',
+    '80A',
+    '80B',
+    '80C',
+    '80D',
+    '85A',
+    '85B',
+    '85C',
+    '85D',
+])
+
+/**
+ * @description Schema for suit size enum
+ * @exports SuitSizeSchema
+ */
+export const SuitSizeSchema = z.enum([
+    '44',
+    '46',
+    '48',
+    '50',
+    '52',
+    '54',
+    '56',
+    '58',
 ])
 
 /**
@@ -70,16 +113,25 @@ export const ArticleSchema = z.object({
     brand: z.string().optional(),
     model: z.string().optional(),
     description: z.string(),
+    size: z
+        .union([
+            BraSizeSchema,
+            GarmentSizeSchema,
+            SuitSizeSchema,
+            ShoeSizeSchema,
+        ])
+        .optional(),
     price: z.number().positive(),
     manufactureDate: z.date().optional(),
     purchaseDate: z.date().optional(),
     state: StateSchema,
+    status: StatusSchema,
     imageUrls: z.array(z.string().url()),
     createdAt: z.date(),
     lastModified: z.date(),
     category: CategoryEnumSchema,
     subCategory: SubcategoryEnumSchema,
-    deliveryType: DeliveryTypeSchema.array(),
+    deliveryType: DeliveryTypeSchema,
     dimensions: DimensionsSchema.optional(),
 })
 
