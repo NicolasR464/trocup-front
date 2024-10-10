@@ -1,6 +1,8 @@
+/* eslint-disable react/jsx-handler-names */
 'use client'
 
 import React from 'react'
+import type { FieldErrors } from 'react-hook-form'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -15,7 +17,7 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/shadcn/ui/form'
-import { Input } from '@/components/shadcn/ui/input'
+import { Input, InputNumber } from '@/components/shadcn/ui/input'
 import {
     Select,
     SelectContent,
@@ -25,27 +27,40 @@ import {
 } from '@/components/shadcn/ui/select'
 import { Textarea } from '@/components/shadcn/ui/textarea'
 
-import { ArticleFormData } from '@/types/formValidations/adCreation'
+import { translations } from '@/utils/constants'
 
+import { DeliveryTypeSchema, StateSchema, StatusSchema } from '@/types/article'
+import { categories, CategoryEnumSchema } from '@/types/article/categories'
+import type { ArticleFormData } from '@/types/formValidations/adCreation'
+import { ArticleFormDataSchema } from '@/types/formValidations/adCreation'
+
+import { RadioGroup, RadioGroupItem } from '../shadcn/ui/radio-group'
+import { cn } from '../shadcn/utils'
+import { Label } from '@radix-ui/react-label'
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@radix-ui/react-popover'
 import { format } from 'date-fns'
 import { Calendar as CalendarIcon } from 'lucide-react'
 
-const ArticleForm = () => {
+const ArticleForm = (): React.JSX.Element => {
     const form = useForm<ArticleFormData>({
-        resolver: zodResolver(articleSchema),
+        resolver: zodResolver(ArticleFormDataSchema),
         defaultValues: {
             adTitle: '',
             brand: '',
             model: '',
             description: '',
-            price: 0,
-            manufactureDate: new Date(),
-            purchaseDate: new Date(),
-            state: 'NEW',
+            manufactureDate: undefined,
+            purchaseDate: undefined,
+            state: undefined,
             status: 'AVAILABLE',
-            category: 'ELECTRONICS',
-            subCategory: 'SMARTPHONE',
-            deliveryType: ['PICKUP'],
+            category: undefined,
+            subCategory: undefined,
+            size: undefined,
+            deliveryType: undefined,
             dimensions: {
                 length: 0,
                 width: 0,
@@ -55,411 +70,522 @@ const ArticleForm = () => {
         },
     })
 
+    const { control, watch, setValue, handleSubmit, register } = form
+
     const onSubmit = (data: ArticleFormData) => {
+        console.log('🚀 onSubmit')
         console.log(data)
-        // Here you would typically send the data to your API
+        /** @TODO : send the data to the API */
+    }
+
+    /**
+     * Handles form validation errors.
+     *
+     * This function is called when form validation fails. It logs the validation errors
+     * to the console for debugging purposes.
+     * @param {FieldErrors<UserRegistration>} errors - The validation errors object
+     * @returns {void}
+     */
+    const onError = (errors: FieldErrors<ArticleFormData>): void => {
+        console.log('Validation Errors:', errors)
     }
 
     return (
         <Form {...form}>
             <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className='space-y-8'
+                onSubmit={handleSubmit(onSubmit, onError)}
+                className='mx-auto max-w-4xl space-y-8 rounded-lg bg-white p-6 shadow-md'
             >
-                <FormField
-                    control={form.control}
-                    name='adTitle'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Ad Title</FormLabel>
-                            <FormControl>
-                                <Input
-                                    placeholder='Enter ad title'
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name='brand'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Brand</FormLabel>
-                            <FormControl>
-                                <Input
-                                    placeholder='Enter brand'
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name='model'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Model</FormLabel>
-                            <FormControl>
-                                <Input
-                                    placeholder='Enter model'
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name='description'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Description</FormLabel>
-                            <FormControl>
-                                <Textarea
-                                    placeholder='Enter description'
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name='price'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Price</FormLabel>
-                            <FormControl>
-                                <Input
-                                    type='number'
-                                    {...field}
-                                    onChange={(e) =>
-                                        field.onChange(
-                                            parseFloat(e.target.value),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name='manufactureDate'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Manufacture Date</FormLabel>
-                            <FormControl>
-                                <DatePicker
-                                    date={field.value}
-                                    setDate={(date) => field.onChange(date)}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name='purchaseDate'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Purchase Date</FormLabel>
-                            <FormControl>
-                                <DatePicker
-                                    date={field.value}
-                                    setDate={(date) => field.onChange(date)}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name='state'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>State</FormLabel>
-                            <Select
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
-                            >
+                <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+                    {/* Ad Title Input */}
+                    <Controller
+                        control={control}
+                        name='adTitle'
+                        render={({ field }) => (
+                            <FormItem className='col-span-full'>
+                                <Label className='text-lg font-semibold'>
+                                    {'Titre de l’annonce'}
+                                </Label>
+                                <FormDescription className='text-sm text-gray-500'>
+                                    {'To do once we have the mutation done'}
+                                </FormDescription>
                                 <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder='Select state' />
-                                    </SelectTrigger>
+                                    <Input
+                                        className='mt-1'
+                                        {...field}
+                                    />
                                 </FormControl>
-                                <SelectContent>
-                                    <SelectItem value='NEW'>New</SelectItem>
-                                    <SelectItem value='USED'>Used</SelectItem>
-                                    <SelectItem value='REFURBISHED'>
-                                        Refurbished
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                            </FormItem>
+                        )}
+                    />
 
-                <FormField
-                    control={form.control}
-                    name='status'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Status</FormLabel>
-                            <Select
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
-                            >
+                    {/* Brand Input */}
+                    <Controller
+                        control={control}
+                        name='brand'
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className='text-lg font-semibold'>
+                                    {'Marque de l’article'}
+                                </FormLabel>
                                 <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder='Select status' />
-                                    </SelectTrigger>
+                                    <Input
+                                        className='mt-1'
+                                        {...field}
+                                    />
                                 </FormControl>
-                                <SelectContent>
-                                    <SelectItem value='AVAILABLE'>
-                                        Available
-                                    </SelectItem>
-                                    <SelectItem value='SOLD'>Sold</SelectItem>
-                                    <SelectItem value='RESERVED'>
-                                        Reserved
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                            </FormItem>
+                        )}
+                    />
 
-                <FormField
-                    control={form.control}
-                    name='category'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Category</FormLabel>
-                            <Select
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
-                            >
+                    {/* Model Input */}
+                    <FormField
+                        control={control}
+                        name='model'
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className='text-lg font-semibold'>
+                                    {'Modèle de l’article'}
+                                </FormLabel>
                                 <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder='Select category' />
-                                    </SelectTrigger>
+                                    <Input
+                                        className='mt-1'
+                                        {...field}
+                                    />
                                 </FormControl>
-                                <SelectContent>
-                                    <SelectItem value='ELECTRONICS'>
-                                        Electronics
-                                    </SelectItem>
-                                    <SelectItem value='CLOTHING'>
-                                        Clothing
-                                    </SelectItem>
-                                    <SelectItem value='FURNITURE'>
-                                        Furniture
-                                    </SelectItem>
-                                    <SelectItem value='OTHER'>Other</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                            </FormItem>
+                        )}
+                    />
 
-                <FormField
-                    control={form.control}
-                    name='subCategory'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Sub Category</FormLabel>
-                            <Select
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
-                            >
+                    {/* Description Textarea */}
+                    <FormField
+                        control={control}
+                        name='description'
+                        render={({ field }) => (
+                            <FormItem className='col-span-full'>
+                                <FormLabel className='text-lg font-semibold'>
+                                    {'Description'}
+                                </FormLabel>
                                 <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder='Select sub category' />
-                                    </SelectTrigger>
+                                    <Textarea
+                                        className='mt-1'
+                                        {...field}
+                                    />
                                 </FormControl>
-                                <SelectContent>
-                                    <SelectItem value='SMARTPHONE'>
-                                        Smartphone
-                                    </SelectItem>
-                                    <SelectItem value='LAPTOP'>
-                                        Laptop
-                                    </SelectItem>
-                                    <SelectItem value='TABLET'>
-                                        Tablet
-                                    </SelectItem>
-                                    <SelectItem value='OTHER'>Other</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                            </FormItem>
+                        )}
+                    />
 
-                <FormField
-                    control={form.control}
-                    name='deliveryType'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Delivery Type</FormLabel>
-                            <FormControl>
-                                <div>
-                                    <label>
-                                        <input
-                                            type='checkbox'
-                                            value='PICKUP'
-                                            checked={field.value.includes(
-                                                'PICKUP',
-                                            )}
-                                            onChange={(e) => {
-                                                const updatedValue = e.target
-                                                    .checked
-                                                    ? [...field.value, 'PICKUP']
-                                                    : field.value.filter(
-                                                          (v) => v !== 'PICKUP',
-                                                      )
-                                                field.onChange(updatedValue)
-                                            }}
+                    {/* Manufacture Date Picker */}
+                    <FormField
+                        control={control}
+                        name='manufactureDate'
+                        render={({ field }) => (
+                            <FormItem className='flex flex-col'>
+                                <FormLabel className='text-lg font-semibold'>
+                                    {'Date de fabrication'}
+                                </FormLabel>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <FormControl>
+                                            <Button
+                                                variant='outline'
+                                                className={cn(
+                                                    'w-[240px] pl-3 text-left font-normal',
+                                                    !field.value &&
+                                                        'text-muted-foreground',
+                                                )}
+                                            >
+                                                {field.value ? (
+                                                    format(field.value, 'PPP')
+                                                ) : (
+                                                    <span>
+                                                        {'Choisissez une date'}
+                                                    </span>
+                                                )}
+                                                <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                                            </Button>
+                                        </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent
+                                        className='w-auto p-0'
+                                        align='start'
+                                    >
+                                        <Calendar
+                                            mode='single'
+                                            className='bg-white'
+                                            selected={field.value}
+                                            onSelect={field.onChange}
+                                            disabled={(date) =>
+                                                date > new Date() ||
+                                                date < new Date('1900-01-01')
+                                            }
+                                            initialFocus
                                         />
-                                        Pickup
-                                    </label>
-                                    <label>
-                                        <input
-                                            type='checkbox'
-                                            value='SHIPPING'
-                                            checked={field.value.includes(
-                                                'SHIPPING',
-                                            )}
-                                            onChange={(e) => {
-                                                const updatedValue = e.target
-                                                    .checked
-                                                    ? [
-                                                          ...field.value,
-                                                          'SHIPPING',
-                                                      ]
-                                                    : field.value.filter(
-                                                          (v) =>
-                                                              v !== 'SHIPPING',
-                                                      )
-                                                field.onChange(updatedValue)
-                                            }}
+                                    </PopoverContent>
+                                </Popover>
+
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    {/* Purchase Date Picker */}
+                    <FormField
+                        control={control}
+                        name='purchaseDate'
+                        render={({ field }) => (
+                            <FormItem className='flex flex-col'>
+                                <FormLabel className='text-lg font-semibold'>
+                                    {'Date d’achat'}
+                                </FormLabel>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <FormControl>
+                                            <Button
+                                                variant='outline'
+                                                className={cn(
+                                                    'w-[240px] pl-3 text-left font-normal',
+                                                    !field.value &&
+                                                        'text-muted-foreground',
+                                                )}
+                                            >
+                                                {field.value ? (
+                                                    format(field.value, 'PPP')
+                                                ) : (
+                                                    <span>
+                                                        {'Choisissez une date'}
+                                                    </span>
+                                                )}
+                                                <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                                            </Button>
+                                        </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent
+                                        className='w-auto p-0'
+                                        align='start'
+                                    >
+                                        <Calendar
+                                            mode='single'
+                                            selected={field.value}
+                                            onSelect={field.onChange}
+                                            disabled={(date) =>
+                                                date > new Date() ||
+                                                date < new Date('1900-01-01')
+                                            }
+                                            initialFocus
                                         />
-                                        Shipping
-                                    </label>
-                                </div>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                                    </PopoverContent>
+                                </Popover>
 
-                <FormField
-                    control={form.control}
-                    name='dimensions.length'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Length</FormLabel>
-                            <FormControl>
-                                <Input
-                                    type='number'
-                                    {...field}
-                                    onChange={(e) =>
-                                        field.onChange(
-                                            parseFloat(e.target.value),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
-                <FormField
-                    control={form.control}
-                    name='dimensions.width'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Width</FormLabel>
-                            <FormControl>
-                                <Input
-                                    type='number'
-                                    {...field}
-                                    onChange={(e) =>
-                                        field.onChange(
-                                            parseFloat(e.target.value),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                    {/* State Select */}
+                    <FormField
+                        control={control}
+                        name='state'
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className='text-lg font-semibold'>
+                                    {'État'}
+                                </FormLabel>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder='Select state' />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {StateSchema.options.map((state) => (
+                                            <SelectItem
+                                                key={state}
+                                                value={state}
+                                            >
+                                                {
+                                                    translations.products
+                                                        .states[state]
+                                                }
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </FormItem>
+                        )}
+                    />
 
-                <FormField
-                    control={form.control}
-                    name='dimensions.height'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Height</FormLabel>
-                            <FormControl>
-                                <Input
-                                    type='number'
-                                    {...field}
-                                    onChange={(e) =>
-                                        field.onChange(
-                                            parseFloat(e.target.value),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                    {/* Status Select */}
+                    <FormField
+                        control={control}
+                        name='status'
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className='text-lg font-semibold'>
+                                    {'Statut'}
+                                </FormLabel>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder='Select status' />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {StatusSchema.options.map((status) => (
+                                            <SelectItem
+                                                key={status}
+                                                value={status}
+                                            >
+                                                {
+                                                    translations.products
+                                                        .status[status]
+                                                }
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </FormItem>
+                        )}
+                    />
 
-                <FormField
-                    control={form.control}
-                    name='dimensions.weight'
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Weight</FormLabel>
-                            <FormControl>
-                                <Input
-                                    type='number'
-                                    {...field}
-                                    onChange={(e) =>
-                                        field.onChange(
-                                            parseFloat(e.target.value),
-                                        )
-                                    }
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                    {/* Category Select */}
+                    <FormField
+                        control={control}
+                        name='category'
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className='text-lg font-semibold'>
+                                    {'Catégorie'}
+                                </FormLabel>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder='Select category' />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {CategoryEnumSchema.options.map(
+                                            (category) => (
+                                                <SelectItem
+                                                    key={category}
+                                                    value={category}
+                                                >
+                                                    {
+                                                        translations.products
+                                                            .categories[
+                                                            category
+                                                        ]
+                                                    }
+                                                </SelectItem>
+                                            ),
+                                        )}
+                                    </SelectContent>
+                                </Select>
+                            </FormItem>
+                        )}
+                    />
 
-                <Button type='submit'>Submit</Button>
+                    {/* Subcategory Select */}
+                    <FormField
+                        control={control}
+                        name='subCategory'
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className='text-lg font-semibold'>
+                                    {'Sous-catégorie'}
+                                </FormLabel>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder='Sélectionner une sous-catégorie' />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {form.watch('category') &&
+                                            categories[
+                                                form.watch('category')
+                                            ].map((subCategory) => (
+                                                <SelectItem
+                                                    key={subCategory}
+                                                    value={subCategory}
+                                                >
+                                                    {subCategory}
+                                                </SelectItem>
+                                            ))}
+                                    </SelectContent>
+                                </Select>
+                            </FormItem>
+                        )}
+                    />
+
+                    {/* Delivery Type Checkboxes */}
+                    <FormField
+                        control={control}
+                        name='deliveryType'
+                        render={({ field }) => (
+                            <FormItem className='space-y-3'>
+                                <FormLabel className='text-lg font-semibold'>
+                                    {'Type de livraison'}
+                                </FormLabel>
+                                <FormControl>
+                                    <RadioGroup
+                                        onValueChange={field.onChange}
+                                        defaultValue={field.value}
+                                        className='flex flex-col space-y-1'
+                                    >
+                                        <FormItem className='flex items-center space-x-3 space-y-0'>
+                                            <FormControl>
+                                                <RadioGroupItem
+                                                    value={
+                                                        DeliveryTypeSchema
+                                                            .options[0]
+                                                    }
+                                                />
+                                            </FormControl>
+                                            <FormLabel className='font-normal'>
+                                                {
+                                                    translations.products
+                                                        .delivery.PICKUP
+                                                }
+                                            </FormLabel>
+                                        </FormItem>
+                                        <FormItem className='flex items-center space-x-3 space-y-0'>
+                                            <FormControl>
+                                                <RadioGroupItem
+                                                    value={
+                                                        DeliveryTypeSchema
+                                                            .options[1]
+                                                    }
+                                                />
+                                            </FormControl>
+                                            <FormLabel className='font-normal'>
+                                                {
+                                                    translations.products
+                                                        .delivery.SHIPPING
+                                                }
+                                            </FormLabel>
+                                        </FormItem>
+                                        <FormItem className='flex items-center space-x-3 space-y-0'>
+                                            <FormControl>
+                                                <RadioGroupItem
+                                                    value={
+                                                        DeliveryTypeSchema
+                                                            .options[2]
+                                                    }
+                                                />
+                                            </FormControl>
+                                            <FormLabel className='font-normal'>
+                                                {
+                                                    translations.products
+                                                        .delivery.BOTH
+                                                }
+                                            </FormLabel>
+                                        </FormItem>
+                                    </RadioGroup>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <div className='flex w-[250px] flex-wrap justify-between'>
+                        {/* Dimensions of the article : Length */}
+                        <FormField
+                            control={control}
+                            name='dimensions.length'
+                            render={({ field }) => (
+                                <FormItem className='m-2 flex flex-col'>
+                                    <FormMessage />
+                                    <FormLabel className='text-base'>
+                                        {'Longueur (cm)'}
+                                    </FormLabel>
+                                    <FormControl>
+                                        <InputNumber
+                                            className='mt-1'
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+
+                        {/* Dimensions of the article : Width */}
+                        <FormField
+                            control={control}
+                            name='dimensions.width'
+                            render={({ field }) => (
+                                <FormItem className='m-2 flex flex-col'>
+                                    <FormLabel className='text-base'>
+                                        {'Largeur (cm)'}
+                                    </FormLabel>
+                                    <FormControl>
+                                        <InputNumber
+                                            className='mt-1'
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+
+                        {/* Dimensions of the article : Height */}
+                        <FormField
+                            control={control}
+                            name='dimensions.height'
+                            render={({ field }) => (
+                                <FormItem className='m-2 flex flex-col'>
+                                    <FormLabel className='text-base'>
+                                        {'Hauteur (cm)'}
+                                    </FormLabel>
+                                    <FormControl>
+                                        <InputNumber
+                                            className='mt-1'
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+
+                        {/* Dimensions of the article : Weight */}
+                        <FormField
+                            control={control}
+                            name='dimensions.weight'
+                            render={({ field }) => (
+                                <FormItem className='m-2 flex flex-col'>
+                                    <FormLabel className='text-base'>
+                                        {'Poids (kl)'}
+                                    </FormLabel>
+                                    <FormControl>
+                                        <InputNumber
+                                            className='mt-1'
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                </div>
+
+                <Button
+                    type='submit'
+                    className='w-full md:w-auto'
+                >
+                    {'Créer l’annonce'}
+                </Button>
             </form>
         </Form>
     )

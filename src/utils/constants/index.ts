@@ -30,7 +30,7 @@ export const userMessages = {
  * Object containing translations
  */
 export const translations = {
-    product: {
+    products: {
         categories: {
             CLOTHING: 'Vêtements',
             SHOES: 'Chaussures',
