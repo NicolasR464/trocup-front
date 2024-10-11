@@ -100,8 +100,8 @@ export const RegistrationForm = (): React.JSX.Element => {
         setValue('pseudo', getRandomUserPseudonym())
     }, [setValue])
 
-    const addressObject = watch('addressObject')
     const avatarUrl = watch('avatarUrl')
+    const addressObject = watch('addressObject')
     const addressInput = watch('addressInput')
 
     /**

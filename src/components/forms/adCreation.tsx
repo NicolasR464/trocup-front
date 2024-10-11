@@ -1,13 +1,20 @@
 /* eslint-disable react/jsx-handler-names */
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import type { FieldErrors } from 'react-hook-form'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 import { Button } from '@/components/shadcn/ui/button'
 import { Calendar } from '@/components/shadcn/ui/calendar'
+import {
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from '@/components/shadcn/ui/command'
 import {
     Form,
     FormControl,
@@ -18,6 +25,7 @@ import {
     FormMessage,
 } from '@/components/shadcn/ui/form'
 import { Input, InputNumber } from '@/components/shadcn/ui/input'
+import { RadioGroup, RadioGroupItem } from '@/components/shadcn/ui/radio-group'
 import {
     Select,
     SelectContent,
@@ -26,16 +34,18 @@ import {
     SelectValue,
 } from '@/components/shadcn/ui/select'
 import { Textarea } from '@/components/shadcn/ui/textarea'
+import { cn } from '@/components/shadcn/utils'
 
+import { getAddressSuggestions } from '@/utils/apiCalls/thirdPartyApis/addressSuggestions'
 import { translations } from '@/utils/constants'
 
+import type { AddressSuggestion } from '@/types/address/gouvApiCall'
 import { DeliveryTypeSchema, StateSchema, StatusSchema } from '@/types/article'
 import { categories, CategoryEnumSchema } from '@/types/article/categories'
 import type { ArticleFormData } from '@/types/formValidations/adCreation'
 import { ArticleFormDataSchema } from '@/types/formValidations/adCreation'
 
-import { RadioGroup, RadioGroupItem } from '../shadcn/ui/radio-group'
-import { cn } from '../shadcn/utils'
+import { useDebouncedCallback } from '@mantine/hooks'
 import { Label } from '@radix-ui/react-label'
 import {
     Popover,
@@ -43,9 +53,16 @@ import {
     PopoverTrigger,
 } from '@radix-ui/react-popover'
 import { format } from 'date-fns'
-import { Calendar as CalendarIcon } from 'lucide-react'
+import {
+    Calendar as CalendarIcon,
+    ChevronsUpDown,
+    Command,
+    House,
+} from 'lucide-react'
 
 const ArticleForm = (): React.JSX.Element => {
+    const [open, setOpen] = useState(false)
+
     const form = useForm<ArticleFormData>({
         resolver: zodResolver(ArticleFormDataSchema),
         defaultValues: {
@@ -67,10 +84,23 @@ const ArticleForm = (): React.JSX.Element => {
                 height: 0,
                 weight: 0,
             },
+            addressInput: '',
+            addressObject: undefined,
         },
     })
 
     const { control, watch, setValue, handleSubmit, register } = form
+
+    const { fields, update } = useFieldArray({
+        control,
+        name: 'addressSuggestions',
+        rules: {
+            required: false,
+        },
+    })
+
+    const addressObject = watch('addressObject')
+    const addressInput = watch('addressInput')
 
     const onSubmit = (data: ArticleFormData) => {
         console.log('🚀 onSubmit')
@@ -89,6 +119,36 @@ const ArticleForm = (): React.JSX.Element => {
     const onError = (errors: FieldErrors<ArticleFormData>): void => {
         console.log('Validation Errors:', errors)
     }
+
+    /**
+     * Fetches address suggestions based on user input.
+     *
+     * This function is debounced to prevent excessive API calls. It only triggers
+     * when the input length is greater than 3 characters.
+     * @param {string} input - The user's input for address search
+     * @returns {Promise<AddressSuggestion[]>} A promise that resolves to an array of address suggestions
+     */
+    const fetchAddressSuggestions = useDebouncedCallback(
+        async (input: string): Promise<AddressSuggestion[]> => {
+            if (input.length > 3) {
+                const addresses = await getAddressSuggestions(input)
+
+                let index = 0
+                if (addresses)
+                    for (const address of addresses) {
+                        update(index, address)
+                        index++
+                    }
+
+                if (!addresses) {
+                    return []
+                }
+            }
+
+            return []
+        },
+        500,
+    )
 
     return (
         <Form {...form}>
@@ -580,11 +640,147 @@ const ArticleForm = (): React.JSX.Element => {
                     </div>
                 </div>
 
+                {/** Article Address */}
+                <div className='flex justify-center'>
+                    <FormField
+                        control={control}
+                        name='addressInput'
+                        render={({ field }) => (
+                            <FormItem className='flex flex-col'>
+                                <FormLabel>
+                                    {'L adresse de l article'}
+                                </FormLabel>
+
+                                <Popover
+                                    open={open}
+                                    onOpenChange={setOpen}
+                                >
+                                    <PopoverTrigger asChild>
+                                        <FormControl>
+                                            <Button
+                                                variant='outline'
+                                                role='combobox'
+                                                aria-expanded={open}
+                                                className={cn(
+                                                    'min-w-full justify-between sm:min-w-[420px]',
+                                                    !field.value &&
+                                                        'text-muted-foreground',
+                                                )}
+                                                onClick={() => {
+                                                    setOpen(true)
+                                                }}
+                                            >
+                                                {!!field.value &&
+                                                    !!addressObject &&
+                                                    Object.keys(addressObject)
+                                                        .length === 0 &&
+                                                    field.value}
+
+                                                {!!addressObject &&
+                                                    Object.keys(addressObject)
+                                                        .length > 0 &&
+                                                    addressObject.label}
+
+                                                {!field.value &&
+                                                    !!addressObject &&
+                                                    Object.keys(addressObject)
+                                                        .length === 0 &&
+                                                    'Rentre ton adresse'}
+                                                <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                                            </Button>
+                                        </FormControl>
+                                    </PopoverTrigger>
+
+                                    <PopoverContent className='w-[300px] p-0'>
+                                        <Command>
+                                            <CommandInput
+                                                value={field.value}
+                                                placeholder='Cherche ton adresse'
+                                                onValueChange={(value) => {
+                                                    const sanitizedValue =
+                                                        value.replaceAll(
+                                                            ',',
+                                                            '',
+                                                        )
+
+                                                    field.onChange(
+                                                        sanitizedValue,
+                                                    )
+
+                                                    fetchAddressSuggestions(
+                                                        sanitizedValue,
+                                                    )
+                                                }}
+                                            />
+                                            <CommandList>
+                                                <CommandEmpty>
+                                                    {addressInput &&
+                                                    addressInput.length > 3 ? (
+                                                        'Aucune adresse trouvée'
+                                                    ) : (
+                                                        <div className='flex justify-center'>
+                                                            <House />
+                                                        </div>
+                                                    )}
+                                                </CommandEmpty>
+
+                                                <CommandGroup>
+                                                    {fields.map(
+                                                        (suggestion, index) => (
+                                                            <CommandItem
+                                                                className='cursor-pointer'
+                                                                key={
+                                                                    suggestion.id
+                                                                }
+                                                                value={
+                                                                    suggestion
+                                                                        .properties
+                                                                        .label
+                                                                }
+                                                                onSelect={() => {
+                                                                    setValue(
+                                                                        'addressObject',
+                                                                        {
+                                                                            ...suggestion.properties,
+                                                                            label: suggestion
+                                                                                .properties
+                                                                                .label,
+                                                                        },
+                                                                    )
+                                                                    setOpen(
+                                                                        false,
+                                                                    )
+                                                                }}
+                                                            >
+                                                                <span
+                                                                    {...register(
+                                                                        `addressSuggestions.${index}.properties.label`,
+                                                                    )}
+                                                                >
+                                                                    {
+                                                                        suggestion
+                                                                            .properties
+                                                                            .label
+                                                                    }
+                                                                </span>
+                                                            </CommandItem>
+                                                        ),
+                                                    )}
+                                                </CommandGroup>
+                                            </CommandList>
+                                        </Command>
+                                    </PopoverContent>
+                                </Popover>
+                            </FormItem>
+                        )}
+                    />
+                </div>
+
                 <Button
                     type='submit'
                     className='w-full md:w-auto'
                 >
-                    {'Estimer l’article'}
+                    {'✨ Estimer l’article'}
                 </Button>
             </form>
         </Form>

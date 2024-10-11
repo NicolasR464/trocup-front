@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { AddressSuggestionSchema } from '@/types/address/gouvApiCall'
+import { AddressSchema } from '@/types/address/userAddress'
 import { ArticleSchema } from '@/types/article'
 
 /**
@@ -23,6 +25,9 @@ export const ArticleFormDataSchema = ArticleSchema.pick({
     description: z
         .string()
         .min(10, 'La description doit contenir au moins 10 caractères'),
+    addressInput: z.string().optional(),
+    addressObject: AddressSchema.optional(),
+    addressSuggestions: z.array(AddressSuggestionSchema).optional(),
 })
 
 export type ArticleFormData = z.infer<typeof ArticleFormDataSchema>
