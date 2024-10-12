@@ -9,6 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/shadcn/ui/button'
 import { Calendar } from '@/components/shadcn/ui/calendar'
 import {
+    Command,
     CommandEmpty,
     CommandGroup,
     CommandInput,
@@ -53,12 +54,7 @@ import {
     PopoverTrigger,
 } from '@radix-ui/react-popover'
 import { format } from 'date-fns'
-import {
-    Calendar as CalendarIcon,
-    ChevronsUpDown,
-    Command,
-    House,
-} from 'lucide-react'
+import { Calendar as CalendarIcon, ChevronsUpDown, House } from 'lucide-react'
 
 const ArticleForm = (): React.JSX.Element => {
     const [open, setOpen] = useState(false)
@@ -560,6 +556,8 @@ const ArticleForm = (): React.JSX.Element => {
                             </FormItem>
                         )}
                     />
+
+                    {/* Dimensions of the article */}
                     <div className='flex w-[250px] flex-wrap justify-between'>
                         {/* Dimensions of the article : Length */}
                         <FormField
@@ -647,10 +645,7 @@ const ArticleForm = (): React.JSX.Element => {
                         name='addressInput'
                         render={({ field }) => (
                             <FormItem className='flex flex-col'>
-                                <FormLabel>
-                                    {'L adresse de l article'}
-                                </FormLabel>
-
+                                <FormLabel>{'Ladresse de larticle'}</FormLabel>
                                 <Popover
                                     open={open}
                                     onOpenChange={setOpen}
@@ -690,7 +685,6 @@ const ArticleForm = (): React.JSX.Element => {
                                             </Button>
                                         </FormControl>
                                     </PopoverTrigger>
-
                                     <PopoverContent className='w-[300px] p-0'>
                                         <Command>
                                             <CommandInput
