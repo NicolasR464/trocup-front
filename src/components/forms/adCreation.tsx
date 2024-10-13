@@ -30,13 +30,16 @@ import { RadioGroup, RadioGroupItem } from '@/components/shadcn/ui/radio-group'
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
+    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from '@/components/shadcn/ui/select'
 import { Textarea } from '@/components/shadcn/ui/textarea'
 import { cn } from '@/components/shadcn/utils'
 
+import { useUserStore } from '@/stores/user'
 import { getAddressSuggestions } from '@/utils/apiCalls/thirdPartyApis/addressSuggestions'
 import { translations } from '@/utils/constants'
 
@@ -54,10 +57,19 @@ import {
     PopoverTrigger,
 } from '@radix-ui/react-popover'
 import { format } from 'date-fns'
-import { Calendar as CalendarIcon, ChevronsUpDown, House } from 'lucide-react'
+import {
+    Calendar as CalendarIcon,
+    ChevronsUpDown,
+    CircleX,
+    House,
+} from 'lucide-react'
 
 const ArticleForm = (): React.JSX.Element => {
     const [open, setOpen] = useState(false)
+
+    const { address: storedAddresses } = useUserStore((state) => state.user)
+
+    console.log(storedAddresses)
 
     const form = useForm<ArticleFormData>({
         resolver: zodResolver(ArticleFormDataSchema),
@@ -638,6 +650,23 @@ const ArticleForm = (): React.JSX.Element => {
                     </div>
                 </div>
 
+                {/** User registed address */}
+                <Select>
+                    <SelectTrigger className='w-[180px]'>
+                        <SelectValue placeholder='Sélectionne une adresse enregistrée' />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectLabel>{'Adresses:'}</SelectLabel>
+                            <SelectItem value='apple'>Apple</SelectItem>
+                            <SelectItem value='banana'>Banana</SelectItem>
+                            <SelectItem value='blueberry'>Blueberry</SelectItem>
+                            <SelectItem value='grapes'>Grapes</SelectItem>
+                            <SelectItem value='pineapple'>Pineapple</SelectItem>
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
+
                 {/** Article Address */}
                 <div className='flex justify-center'>
                     <FormField
@@ -646,47 +675,75 @@ const ArticleForm = (): React.JSX.Element => {
                         render={({ field }) => (
                             <FormItem className='flex flex-col'>
                                 <FormLabel>
-                                    {'L’adresse de l’article'}
+                                    {
+                                        'Rajoute une adresse où se situe l’article'
+                                    }
                                 </FormLabel>
                                 <Popover
                                     open={open}
                                     onOpenChange={setOpen}
                                 >
-                                    <PopoverTrigger asChild>
-                                        <FormControl>
-                                            <Button
-                                                variant='outline'
-                                                role='combobox'
-                                                aria-expanded={open}
-                                                className={cn(
-                                                    'min-w-full justify-between sm:min-w-[420px]',
-                                                    !field.value &&
-                                                        'text-muted-foreground',
-                                                )}
-                                                onClick={() => {
-                                                    setOpen(true)
-                                                }}
-                                            >
-                                                {!!field.value &&
-                                                    !!addressObject &&
-                                                    Object.keys(addressObject)
-                                                        .length === 0 &&
-                                                    field.value}
+                                    <div className='flex items-center'>
+                                        <PopoverTrigger asChild>
+                                            <FormControl>
+                                                <Button
+                                                    variant='outline'
+                                                    role='combobox'
+                                                    aria-expanded={open}
+                                                    className={cn(
+                                                        'min-w-full justify-between sm:min-w-[420px]',
+                                                        !field.value &&
+                                                            'text-muted-foreground',
+                                                    )}
+                                                    onClick={() => {
+                                                        if (!open) {
+                                                            setOpen(true)
+                                                        }
+                                                    }}
+                                                >
+                                                    {!!field.value &&
+                                                        !!addressObject &&
+                                                        Object.keys(
+                                                            addressObject,
+                                                        ).length === 0 &&
+                                                        field.value}
+                                                    {!!addressObject &&
+                                                        Object.keys(
+                                                            addressObject,
+                                                        ).length > 0 &&
+                                                        addressObject.label}
+                                                    {!field.value &&
+                                                        !!addressObject &&
+                                                        Object.keys(
+                                                            addressObject,
+                                                        ).length === 0 &&
+                                                        'Rentre ton adresse'}
 
-                                                {!!addressObject &&
-                                                    Object.keys(addressObject)
-                                                        .length > 0 &&
-                                                    addressObject.label}
+                                                    {!!addressObject &&
+                                                        Object.keys(
+                                                            addressObject,
+                                                        ).length > 0 && (
+                                                            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                                                        )}
+                                                </Button>
+                                            </FormControl>
+                                        </PopoverTrigger>
+                                        {!!addressObject &&
+                                            Object.keys(addressObject).length >
+                                                0 && (
+                                                <CircleX
+                                                    className='ml-2 h-6 w-6 shrink-0 text-red-500 opacity-50'
+                                                    onClick={() => {
+                                                        setValue(
+                                                            'addressObject',
+                                                            undefined,
+                                                        )
+                                                        setOpen(false)
+                                                    }}
+                                                />
+                                            )}
+                                    </div>
 
-                                                {!field.value &&
-                                                    !!addressObject &&
-                                                    Object.keys(addressObject)
-                                                        .length === 0 &&
-                                                    'Rentre ton adresse'}
-                                                <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                                            </Button>
-                                        </FormControl>
-                                    </PopoverTrigger>
                                     <PopoverContent className='w-[300px] p-0'>
                                         <Command>
                                             <CommandInput

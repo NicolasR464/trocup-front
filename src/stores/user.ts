@@ -22,23 +22,13 @@ export const useUserStore = create<UserStore>()(
                 pseudo: '',
                 name: '',
                 surname: '',
-                address: [],
-                geopoints: {
-                    type: '',
-                    coordinates: [],
-                },
                 email: '',
-                password: '',
-                sexe: 'autre',
                 phoneNumber: undefined,
                 activityStatus: '',
                 birthDate: new Date(),
-                bankInfo: undefined,
                 avatarUrl: undefined,
                 isPremium: false,
-                favoriteArticles: undefined,
                 credit: undefined,
-                comments: undefined,
                 articles: undefined,
                 debit: undefined,
             },
@@ -46,6 +36,12 @@ export const useUserStore = create<UserStore>()(
             setUserData: (userData: Partial<User>): void => {
                 set((state) => {
                     state.user = { ...state.user, ...userData }
+                })
+            },
+
+            deleteStoredUserData: (): void => {
+                set((state) => {
+                    state.user = {} as User
                 })
             },
         })),

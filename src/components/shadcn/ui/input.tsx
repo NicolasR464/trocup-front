@@ -97,15 +97,6 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
             onChange?.(newValue as number)
         }
 
-        const handleStep = (step: 'up' | 'down') => {
-            if (inputRef.current) {
-                const currentValue = Number(inputRef.current.value)
-                const newValue =
-                    step === 'up' ? currentValue + 1 : currentValue - 1
-                onChange?.(newValue)
-            }
-        }
-
         return (
             <div className='relative inline-flex h-8 w-24 rounded-md border border-input'>
                 <Input
@@ -114,7 +105,7 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
                     value={value?.toString() ?? ''}
                     onChange={handleChange}
                     className={cn(
-                        'h-full w-full rounded-r-none border-none px-2 py-1 text-sm',
+                        'h-full w-full rounded-r-none border-none px-2 py-2 text-sm',
                         '[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
                         className,
                     )}
