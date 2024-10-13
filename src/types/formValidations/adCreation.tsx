@@ -25,7 +25,17 @@ export const ArticleFormDataSchema = ArticleSchema.pick({
     description: z
         .string()
         .min(10, 'La description doit contenir au moins 10 caractères'),
+    /**
+     * @description The label of the address chosen by the user from the list of saved addresses
+     */
+    savedUserAddressLabel: z.string().optional(),
+    /**
+     * @description User input to add a new address
+     */
     addressInput: z.string().optional(),
+    /**
+     * @description The full address chosen by the user
+     */
     addressObject: AddressSchema.optional(),
     addressSuggestions: z.array(AddressSuggestionSchema).optional(),
 })

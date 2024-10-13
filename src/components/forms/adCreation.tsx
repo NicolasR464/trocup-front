@@ -65,7 +65,7 @@ import {
 } from 'lucide-react'
 
 const ArticleForm = (): React.JSX.Element => {
-    const [open, setOpen] = useState(false)
+    const [newAddressOpen, setNewAddressOpen] = useState(false)
 
     const { address: storedAddresses } = useUserStore((state) => state.user)
 
@@ -92,6 +92,7 @@ const ArticleForm = (): React.JSX.Element => {
                 height: 0,
                 weight: 0,
             },
+            savedUserAddressLabel: undefined,
             addressInput: '',
             addressObject: undefined,
         },
@@ -107,8 +108,10 @@ const ArticleForm = (): React.JSX.Element => {
         },
     })
 
+    // Watch user inputs
     const addressObject = watch('addressObject')
     const addressInput = watch('addressInput')
+    const savedUserAddressLabel = watch('savedUserAddressLabel')
 
     const onSubmit = (data: ArticleFormData) => {
         console.log('🚀 onSubmit')
@@ -157,6 +160,8 @@ const ArticleForm = (): React.JSX.Element => {
         },
         500,
     )
+
+    const addressInputClass = 'w-full sm:w-[420px]'
 
     return (
         <Form {...form}>
@@ -366,7 +371,7 @@ const ArticleForm = (): React.JSX.Element => {
                                 >
                                     <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder='Select state' />
+                                            <SelectValue placeholder='L’état de l’objet' />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
@@ -650,22 +655,80 @@ const ArticleForm = (): React.JSX.Element => {
                     </div>
                 </div>
 
-                {/** User registed address */}
-                <Select>
-                    <SelectTrigger className='w-[180px]'>
-                        <SelectValue placeholder='Sélectionne une adresse enregistrée' />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            <SelectLabel>{'Adresses:'}</SelectLabel>
-                            <SelectItem value='apple'>Apple</SelectItem>
-                            <SelectItem value='banana'>Banana</SelectItem>
-                            <SelectItem value='blueberry'>Blueberry</SelectItem>
-                            <SelectItem value='grapes'>Grapes</SelectItem>
-                            <SelectItem value='pineapple'>Pineapple</SelectItem>
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
+                {/** Saved user address */}
+                {JSON.stringify(savedUserAddressLabel) ?? (
+                    <>no saved address selected</>
+                )}
+                {!!storedAddresses && storedAddresses.length > 0 && (
+                    <div className='flex justify-center'>
+                        <FormField
+                            control={control}
+                            name='savedUserAddressLabel'
+                            render={({ field }) => (
+                                <FormItem className={addressInputClass}>
+                                    <FormLabel>
+                                        {
+                                            'Sélectionne une de tes adresses\u00A0: '
+                                        }
+                                    </FormLabel>
+                                    <div className='flex items-center'>
+                                        <Select
+                                            onValueChange={(value) => {
+                                                console.log('🔥')
+
+                                                console.log(value)
+                                                setValue(
+                                                    'addressObject',
+                                                    undefined,
+                                                )
+                                                field.onChange(value)
+                                            }}
+                                            defaultValue={field.value}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger
+                                                    className={cn(
+                                                        addressInputClass,
+                                                        'justify-between',
+                                                        'h-10',
+                                                    )}
+                                                >
+                                                    <SelectValue placeholder='Choisis une adresse' />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {storedAddresses.map(
+                                                    (address) => (
+                                                        <SelectItem
+                                                            key={address.label}
+                                                            value={
+                                                                address.label
+                                                            }
+                                                        >
+                                                            {address.label}
+                                                        </SelectItem>
+                                                    ),
+                                                )}
+                                            </SelectContent>
+                                        </Select>
+                                        {!!savedUserAddressLabel && (
+                                            <CircleX
+                                                className='ml-2 h-6 w-6 shrink-0 cursor-pointer text-red-500'
+                                                onClick={() => {
+                                                    setValue(
+                                                        'savedUserAddressLabel',
+                                                        undefined,
+                                                    )
+                                                }}
+                                            />
+                                        )}
+                                    </div>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                )}
 
                 {/** Article Address */}
                 <div className='flex justify-center'>
@@ -673,15 +736,18 @@ const ArticleForm = (): React.JSX.Element => {
                         control={control}
                         name='addressInput'
                         render={({ field }) => (
-                            <FormItem className='flex flex-col'>
-                                <FormLabel>
-                                    {
-                                        'Rajoute une adresse où se situe l’article'
-                                    }
+                            <FormItem
+                                className={`flex flex-col ${addressInputClass}`}
+                            >
+                                <FormLabel className='w-full'>
+                                    {!!storedAddresses &&
+                                    storedAddresses.length > 0
+                                        ? 'Ou rajoute une nouvelle adresse où se situe l’article :'
+                                        : 'Rajoute une nouvelle adresse où se situe l’article :'}
                                 </FormLabel>
                                 <Popover
-                                    open={open}
-                                    onOpenChange={setOpen}
+                                    open={newAddressOpen}
+                                    onOpenChange={setNewAddressOpen}
                                 >
                                     <div className='flex items-center'>
                                         <PopoverTrigger asChild>
@@ -689,15 +755,20 @@ const ArticleForm = (): React.JSX.Element => {
                                                 <Button
                                                     variant='outline'
                                                     role='combobox'
-                                                    aria-expanded={open}
+                                                    aria-expanded={
+                                                        newAddressOpen
+                                                    }
                                                     className={cn(
-                                                        'min-w-full justify-between sm:min-w-[420px]',
+                                                        addressInputClass,
+                                                        'justify-between',
                                                         !field.value &&
                                                             'text-muted-foreground',
                                                     )}
                                                     onClick={() => {
-                                                        if (!open) {
-                                                            setOpen(true)
+                                                        if (!newAddressOpen) {
+                                                            setNewAddressOpen(
+                                                                true,
+                                                            )
                                                         }
                                                     }}
                                                 >
@@ -732,13 +803,13 @@ const ArticleForm = (): React.JSX.Element => {
                                             Object.keys(addressObject).length >
                                                 0 && (
                                                 <CircleX
-                                                    className='ml-2 h-6 w-6 shrink-0 text-red-500 opacity-50'
+                                                    className='ml-2 h-6 w-6 shrink-0 cursor-pointer text-red-500'
                                                     onClick={() => {
                                                         setValue(
                                                             'addressObject',
                                                             undefined,
                                                         )
-                                                        setOpen(false)
+                                                        setNewAddressOpen(false)
                                                     }}
                                                 />
                                             )}
@@ -748,7 +819,7 @@ const ArticleForm = (): React.JSX.Element => {
                                         <Command>
                                             <CommandInput
                                                 value={field.value}
-                                                placeholder='Cherche ton adresse'
+                                                placeholder='Cherche une nouvelle adresse'
                                                 onValueChange={(value) => {
                                                     const sanitizedValue =
                                                         value.replaceAll(
@@ -800,7 +871,7 @@ const ArticleForm = (): React.JSX.Element => {
                                                                                 .label,
                                                                         },
                                                                     )
-                                                                    setOpen(
+                                                                    setNewAddressOpen(
                                                                         false,
                                                                     )
                                                                 }}
