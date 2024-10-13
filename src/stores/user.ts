@@ -2,18 +2,11 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 
-import type { Address } from '@/types/address/userAddress'
-
-type UserData = {
-    pseudo: string
-    avatarUrl: string
-    isPremium: boolean
-    address?: Address
-}
+import type { User } from '@/types/user'
 
 type UserStore = {
-    user: UserData
-    setUserData: (userData: Partial<UserData>) => void
+    user: User
+    setUserData: (userData: Partial<User>) => void
 }
 
 /**
@@ -24,13 +17,33 @@ export const useUserStore = create<UserStore>()(
     persist(
         immer((set) => ({
             user: {
+                id: '',
+                version: 0,
                 pseudo: '',
-                avatarUrl: '',
+                name: '',
+                surname: '',
+                address: [],
+                geopoints: {
+                    type: '',
+                    coordinates: [],
+                },
+                email: '',
+                password: '',
+                sexe: 'autre',
+                phoneNumber: undefined,
+                activityStatus: '',
+                birthDate: new Date(),
+                bankInfo: undefined,
+                avatarUrl: undefined,
                 isPremium: false,
-                address: undefined,
+                favoriteArticles: undefined,
+                credit: undefined,
+                comments: undefined,
+                articles: undefined,
+                debit: undefined,
             },
 
-            setUserData: (userData: Partial<UserData>): void => {
+            setUserData: (userData: Partial<User>): void => {
                 set((state) => {
                     state.user = { ...state.user, ...userData }
                 })
