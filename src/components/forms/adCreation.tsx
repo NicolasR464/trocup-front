@@ -655,10 +655,7 @@ const ArticleForm = (): React.JSX.Element => {
                     </div>
                 </div>
 
-                {/** Saved user address */}
-                {JSON.stringify(savedUserAddressLabel) ?? (
-                    <>no saved address selected</>
-                )}
+                {/** Saved user addresses */}
                 {!!storedAddresses && storedAddresses.length > 0 && (
                     <div className='flex justify-center'>
                         <FormField
@@ -674,16 +671,13 @@ const ArticleForm = (): React.JSX.Element => {
                                     <div className='flex items-center'>
                                         <Select
                                             onValueChange={(value) => {
-                                                console.log('🔥')
-
-                                                console.log(value)
                                                 setValue(
                                                     'addressObject',
                                                     undefined,
                                                 )
                                                 field.onChange(value)
                                             }}
-                                            defaultValue={field.value}
+                                            value={field.value ?? ''}
                                         >
                                             <FormControl>
                                                 <SelectTrigger
@@ -873,6 +867,11 @@ const ArticleForm = (): React.JSX.Element => {
                                                                     )
                                                                     setNewAddressOpen(
                                                                         false,
+                                                                    )
+
+                                                                    setValue(
+                                                                        'savedUserAddressLabel',
+                                                                        undefined,
                                                                     )
                                                                 }}
                                                             >
