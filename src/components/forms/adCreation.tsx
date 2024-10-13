@@ -645,7 +645,9 @@ const ArticleForm = (): React.JSX.Element => {
                         name='addressInput'
                         render={({ field }) => (
                             <FormItem className='flex flex-col'>
-                                <FormLabel>{'Ladresse de larticle'}</FormLabel>
+                                <FormLabel>
+                                    {'L’adresse de l’article'}
+                                </FormLabel>
                                 <Popover
                                     open={open}
                                     onOpenChange={setOpen}

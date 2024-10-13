@@ -155,7 +155,7 @@ export const RegistrationForm = (): React.JSX.Element => {
         const dataToSend = {
             avatarUrl,
             pseudo: pseudo.trim(),
-            ...(addressObject && { address: addressObject }),
+            ...(addressObject && { address: [addressObject] }),
         }
 
         await mutateAsync(
