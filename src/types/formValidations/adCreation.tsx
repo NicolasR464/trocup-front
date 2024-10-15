@@ -38,8 +38,6 @@ export const ArticleFormDataSchema = ArticleSchema.pick({
      */
     addressObject: AddressSchema.optional(),
     addressSuggestions: z.array(AddressSuggestionSchema).optional(),
-    categoryPrefill: z.string().optional(),
-    subCategoryPrefill: z.string().optional(),
 })
 
 export type ArticleFormData = z.infer<typeof ArticleFormDataSchema>

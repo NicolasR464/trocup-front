@@ -45,11 +45,11 @@ import {
     products,
     productStates,
     productStatus,
+    subcategoriesList,
 } from '@/utils/constants/translations'
 
 import type { AddressSuggestion } from '@/types/address/gouvApiCall'
 import { DeliveryTypeSchema, StateSchema, StatusSchema } from '@/types/article'
-import { CategoryEnumSchema } from '@/types/article/categories'
 import type { ArticleFormData } from '@/types/formValidations/adCreation'
 import { ArticleFormDataSchema } from '@/types/formValidations/adCreation'
 
@@ -71,11 +71,11 @@ import {
 const ArticleForm = (): React.JSX.Element => {
     const [newAddressOpen, setNewAddressOpen] = useState(false)
 
+    const addressInputClass = 'w-full sm:w-[420px]'
+
     // Data stored in Zustand stores
     const { address: storedAddresses } = useUserStore((state) => state.user)
     const analyzedImage = useArticleStore((state) => state.analysedImage)
-
-    console.log(analyzedImage)
 
     const form = useForm<ArticleFormData>({
         resolver: zodResolver(ArticleFormDataSchema),
@@ -89,9 +89,7 @@ const ArticleForm = (): React.JSX.Element => {
             state: undefined,
             status: 'AVAILABLE',
             category: undefined,
-            categoryPrefill: undefined,
             subCategory: undefined,
-            subCategoryPrefill: undefined,
             size: undefined,
             deliveryType: undefined,
             dimensions: {
@@ -106,7 +104,7 @@ const ArticleForm = (): React.JSX.Element => {
         },
     })
 
-    const { control, watch, setValue, handleSubmit, register } = form
+    const { reset, control, watch, setValue, handleSubmit, register } = form
 
     const { fields, update } = useFieldArray({
         control,
@@ -116,29 +114,81 @@ const ArticleForm = (): React.JSX.Element => {
         },
     })
 
-    // Set prefilled values from the analyzed image
-    useEffect(() => {
-        // Prefill brand
-        setValue('brand', analyzedImage.brand)
-
-        for (const tag of analyzedImage.tags) {
-            const categoryFound = categoriesList.find((cat) =>
-                cat.startsWith(tag.toUpperCase()),
-            )
-            if (categoryFound) {
-                setValue('categoryPrefill', categoryFound)
-                break
-            }
-        }
-    }, [analyzedImage, setValue])
-
     // Watch user inputs dynamically
     const addressObjectWatch = watch('addressObject')
     const addressInputWatch = watch('addressInput')
     const savedUserAddressLabelWatch = watch('savedUserAddressLabel')
-    const categoryWatch = form.watch('category')
-    const categoryPrefillWatch = form.watch('categoryPrefill')
+    const categoryWatch = watch('category')
+    const subCategoryWatch = watch('subCategory')
 
+    // Set prefilled values from the analyzed image
+    useEffect(() => {
+        // reset({
+        //     brand: '',
+        //     category: undefined,
+        //     subCategory: undefined,
+        // })
+
+        // Prefill brand
+        setValue(
+            'brand',
+            analyzedImage.brand.charAt(0).toUpperCase() +
+                analyzedImage.brand.slice(1),
+        )
+
+        // Prefill category
+        for (const tag of analyzedImage.tags) {
+            const categoryFound = categoriesList.find(
+                (cat) =>
+                    cat.includes(tag.toUpperCase()) ||
+                    tag.toUpperCase().includes(cat),
+            )
+            if (categoryFound && !categoryWatch) {
+                setValue('category', categoryFound)
+
+                break
+            }
+        }
+    }, [analyzedImage, reset, setValue])
+
+    useEffect(() => {
+        // Prefill subCategory
+        if (categoryWatch)
+            for (const tag of analyzedImage.tags) {
+                const subCategoryFound = subcategoriesList.find(
+                    (subCat) =>
+                        subCat.includes(tag.toUpperCase()) ||
+                        tag.toUpperCase().includes(subCat),
+                )
+                console.log('subCategoryFound 🔥', subCategoryFound)
+
+                if (subCategoryFound && !subCategoryWatch) {
+                    console.log('IN THE IF 🔥', subCategoryFound)
+
+                    setValue(
+                        'subCategory',
+                        subCategoryFound.replaceAll(' ', '_'),
+                    )
+
+                    console.log('subCategoryWatch 🔥', subCategoryWatch)
+                    break
+                }
+            }
+    }, [analyzedImage, reset, setValue, categoryWatch])
+
+    // Separate useEffects to log updates
+    useEffect(() => {
+        console.log('categoryWatch updated:', categoryWatch)
+    }, [categoryWatch])
+
+    useEffect(() => {
+        console.log('subCategoryWatch updated:', subCategoryWatch)
+    }, [subCategoryWatch])
+    /**
+     * Handles the form submission.
+     * @param {ArticleFormData} data - The form data to be submitted
+     * @returns {void}
+     */
     const onSubmit = (data: ArticleFormData) => {
         /** @TODO : send the data to the API */
     }
@@ -184,8 +234,6 @@ const ArticleForm = (): React.JSX.Element => {
         },
         500,
     )
-
-    const addressInputClass = 'w-full sm:w-[420px]'
 
     return (
         <Form {...form}>
@@ -255,6 +303,7 @@ const ArticleForm = (): React.JSX.Element => {
                         )}
                     />
 
+                    {JSON.stringify(categoryWatch)}
                     {/* Category Select */}
                     <FormField
                         control={control}
@@ -266,8 +315,8 @@ const ArticleForm = (): React.JSX.Element => {
                                 </FormLabel>
                                 <Select
                                     onValueChange={field.onChange}
-                                    value={categoryPrefillWatch ?? field.value}
-                                    defaultValue={categoryPrefillWatch ?? ''}
+                                    value={categoryWatch ?? field.value}
+                                    defaultValue={categoryWatch}
                                 >
                                     <FormControl>
                                         <SelectTrigger>
@@ -275,27 +324,25 @@ const ArticleForm = (): React.JSX.Element => {
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        {CategoryEnumSchema.options.map(
-                                            (category) => (
-                                                <SelectItem
-                                                    key={category}
-                                                    value={category}
-                                                >
-                                                    {
-                                                        products.categories[
-                                                            category
-                                                        ].tag
-                                                    }
-                                                </SelectItem>
-                                            ),
-                                        )}
+                                        {categoriesList.map((category) => (
+                                            <SelectItem
+                                                key={category}
+                                                value={category}
+                                            >
+                                                {
+                                                    products.categories[
+                                                        category
+                                                    ].tag
+                                                }
+                                            </SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                             </FormItem>
                         )}
                     />
 
-                    {JSON.stringify(categoryPrefillWatch)}
+                    {JSON.stringify(subCategoryWatch)}
                     {/* Subcategory Select */}
                     <FormField
                         control={control}
@@ -307,9 +354,8 @@ const ArticleForm = (): React.JSX.Element => {
                                 </FormLabel>
                                 <Select
                                     onValueChange={field.onChange}
-                                    defaultValue={
-                                        categoryPrefillWatch ?? field.value
-                                    }
+                                    value={subCategoryWatch ?? field.value}
+                                    defaultValue={subCategoryWatch}
                                 >
                                     <FormControl>
                                         <SelectTrigger>
@@ -320,7 +366,7 @@ const ArticleForm = (): React.JSX.Element => {
                                         {!!categoryWatch &&
                                             Object.entries(
                                                 products.categories[
-                                                    categoryWatch
+                                                    categoryWatch as keyof typeof products.categories
                                                 ].subcategories,
                                             ).map(([key, value]) => (
                                                 <SelectItem
@@ -679,7 +725,9 @@ const ArticleForm = (): React.JSX.Element => {
                             render={({ field }) => (
                                 <FormItem className={addressInputClass}>
                                     <FormLabel>
-                                        {'Sélectionne une adresse\u00A0: '}
+                                        {
+                                            'Sélectionne une adresse enregistrée\u00A0: '
+                                        }
                                     </FormLabel>
                                     <div className='flex items-center'>
                                         <Select
@@ -751,8 +799,8 @@ const ArticleForm = (): React.JSX.Element => {
                                 <FormLabel className='w-full'>
                                     {!!storedAddresses &&
                                     storedAddresses.length > 0
-                                        ? 'Ou rajoute une nouvelle adresse où se situe l’article :'
-                                        : 'Rajoute une nouvelle adresse où se situe l’article :'}
+                                        ? 'Ou rajoute une nouvelle adresse :'
+                                        : 'Rajoute une nouvelle adresse :'}
                                 </FormLabel>
                                 <Popover
                                     open={newAddressOpen}

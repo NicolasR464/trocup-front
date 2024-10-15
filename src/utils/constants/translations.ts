@@ -9,8 +9,8 @@ export const products = {
                 DRESSES: 'Robes',
                 JACKETS: 'Vestes',
                 JEANS: 'Jeans',
+                OTHER: 'Autre',
                 PAJAMAS: 'Pyjamas',
-                TROUSERS: 'Pantalons',
                 SHIRTS: 'Chemises',
                 SKIRTS: 'Jupes',
                 SOCKS: 'Chaussettes',
@@ -18,6 +18,7 @@ export const products = {
                 SWEATERS: 'Pulls',
                 SWIMWEAR: 'Maillots de bain',
                 T_SHIRTS: 'T-shirts',
+                TROUSERS: 'Pantalons',
                 UNDERWEAR: 'Sous-vêtements',
             },
         },
@@ -31,6 +32,7 @@ export const products = {
                 HIGH_HEELS: 'Chaussures à talons',
                 HIKING_SHOES: 'Chaussures de randonnée',
                 LOAFERS: 'Mocassins',
+                OTHER: 'Autre',
                 SANDALS: 'Sandales',
                 SAFETY_SHOES: 'Chaussures de sécurité',
                 SNEAKERS: 'Baskets',
@@ -49,6 +51,7 @@ export const products = {
                 HATS: 'Chapeaux',
                 KEYCHAINS: 'Porte-clés',
                 NECK_SCARVES: 'Foulards',
+                OTHER: 'Autre',
                 SCARVES: 'Écharpes',
                 SUNGLASSES: 'Lunettes de soleil',
                 SUITCASES: 'Valises',
@@ -57,18 +60,20 @@ export const products = {
                 WALLETS: 'Portefeuilles',
             },
         },
-        WATCHES_JEWELRY: {
+        WATCHES_JEWELLERY: {
             tag: 'Montres et bijoux',
             subcategories: {
                 BRACELETS: 'Bracelets',
                 BROOCHES: 'Broches',
                 COSTUME_JEWELRY: 'Bijoux fantaisie',
                 EARRINGS: 'Boucles d’oreilles',
+                GEMSTONES: 'Pierres précieuses',
                 GOLD_JEWELRY: 'Bijoux en or',
                 NECKLACES: 'Colliers',
                 PENDANTS: 'Pendentifs',
                 PRECIOUS_STONES: 'Pierres précieuses',
                 RINGS: 'Bagues',
+                OTHER: 'Autre',
                 SILVER_JEWELRY: 'Bijoux en argent',
                 WATCH_ACCESSORIES: 'Accessoires pour montres',
                 WATCHES: 'Montres',
@@ -87,6 +92,7 @@ export const products = {
                 BIBS: 'Bavoirs',
                 BODYSUITS: 'Bodies',
                 CHRISTENING_CLOTHES: 'Vêtements de baptême',
+                OTHER: 'Autre',
                 OVERALLS: 'Salopettes',
                 SLEEP_SACKS: 'Gigoteuses',
             },
@@ -102,6 +108,7 @@ export const products = {
                 DOLLS: 'Poupées',
                 EDUCATIONAL_TOYS: 'Jeux éducatifs',
                 ELECTRONIC_GAMES: 'Jeux électroniques',
+                OTHER: 'Autre',
                 OUTDOOR_TOYS: 'Jeux d’extérieur',
                 PUZZLES: 'Puzzles',
                 ROLE_PLAYING_GAMES: 'Jeux de rôle',
@@ -116,8 +123,10 @@ export const products = {
                 ARMCHAIRS: 'Fauteuils',
                 BEDS: 'Lits',
                 CHAIRS: 'Chaises',
+                COFFEE_TABLES: 'Tables basses',
                 DESKS: 'Bureaux',
                 DRESSERS: 'Commodes',
+                OTHER: 'Autre',
                 SHELVES: 'Étagères',
                 SIDEBOARDS: 'Buffets',
                 SOFAS: 'Canapés',
@@ -140,6 +149,7 @@ export const products = {
                 FOOD_PROCESSORS: 'Robots de cuisine',
                 KETTLES: 'Bouilloires',
                 MICROWAVES: 'Micro-ondes',
+                OTHER: 'Autre',
                 OVENS: 'Fours',
                 REFRIGERATORS: 'Réfrigérateurs',
                 TOASTERS: 'Grille-pain',
@@ -163,6 +173,7 @@ export const products = {
                 PAINTINGS: 'Tableaux',
                 PHOTO_FRAMES: 'Cadres photo',
                 RUGS: 'Tapis',
+                OTHER: 'Autre',
                 VASES: 'Vases',
             },
         },
@@ -170,16 +181,29 @@ export const products = {
             tag: 'Électronique',
             subcategories: {
                 ACTION_CAMERAS: 'Caméras d’action',
+                AUDIO_RECEIVERS: 'Récepteurs audio',
                 BLUETOOTH_SPEAKERS: 'Enceintes Bluetooth',
                 CAMERAS: 'Appareils photo',
+                COMPUTER_COMPONENTS: 'Composants d’ordinateur',
+                DESKTOP_COMPUTERS: 'Ordinateurs de bureau',
                 DRONES: 'Drones',
+                E_READERS: 'Liseuses',
                 ELECTRONIC_ACCESSORIES: 'Accessoires électroniques',
+                EXTERNAL_STORAGE: 'Stockage externe',
                 GAMING_CONSOLES: 'Consoles de jeu',
+                GPS_DEVICES: 'Appareils GPS',
                 HEADPHONES: 'Casques audio',
+                KEYBOARDS: 'Claviers',
                 LAPTOPS: 'Ordinateurs portables',
+                LOUDSPEAKERS: 'Enceintes',
+                MICROPHONES: 'Microphones',
                 MOBILE_PHONES: 'Téléphones mobiles',
+                MONITORS: 'Écrans',
+                NETWORK_EQUIPMENT: 'Équipement réseau',
+                OTHER: 'Autre',
                 PRINTERS: 'Imprimantes',
                 PROJECTORS: 'Projecteurs',
+                SMART_HOME_DEVICES: 'Appareils domotiques',
                 SMARTWATCHES: 'Montres connectées',
                 TABLETS: 'Tablettes',
                 TELEVISIONS: 'Télévisions',
@@ -199,6 +223,7 @@ export const products = {
                 KIDS_BIKES: 'Vélos pour enfants',
                 MOUNTAIN_BIKES: 'Vélos de montagne',
                 MOUNTAIN_BIKE_ACCESSORIES: 'Accessoires VTT',
+                OTHER: 'Autre',
                 ROAD_BIKES: 'Vélos de route',
             },
         },
@@ -215,6 +240,7 @@ export const products = {
                 EBOOKS: 'Livres numériques',
                 ESSAYS: 'Essais',
                 NOVELS: 'Romans',
+                OTHER: 'Autre',
                 POETRY: 'Poésie',
                 PRACTICAL_GUIDES: 'Guides pratiques',
                 TEXTBOOKS: 'Manuels scolaires',
@@ -228,6 +254,7 @@ export const products = {
                 EXERCISE_BIKES: 'Vélos d’appartement',
                 FITNESS_EQUIPMENT: 'Équipement de fitness',
                 FOOTBALL_GEAR: 'Articles de football',
+                OTHER: 'Autre',
                 RACKETS: 'Raquettes',
                 SPORTS_BAGS: 'Sacs de sport',
                 SPORTS_SHOES: 'Chaussures de sport',
@@ -246,6 +273,7 @@ export const products = {
                 BEAUTY_DEVICES: 'Appareils de soin',
                 HAIR_PRODUCTS: 'Produits pour cheveux',
                 NAIL_CARE: 'Soins des ongles',
+                OTHER: 'Autre',
             },
         },
         PET_SUPPLIES: {
@@ -257,6 +285,7 @@ export const products = {
                 GROOMING_ACCESSORIES: 'Accessoires de toilettage',
                 LITTER: 'Litières',
                 LITTER_BOXES: 'Bacs à litière',
+                OTHER: 'Autre',
                 PET_CLOTHING: 'Vêtements pour animaux',
                 PET_FOOD: 'Nourriture pour animaux',
                 PET_TOYS: 'Jouets pour animaux',
@@ -272,6 +301,7 @@ export const products = {
                 HAMMOCKS: 'Hamacs',
                 IRRIGATION_SYSTEMS: 'Systèmes d’irrigation',
                 LAWN_MOWERS: 'Tondeuses',
+                OTHER: 'Autre',
                 OUTDOOR_LIGHTING: 'Éclairages extérieurs',
                 PLANTS_AND_FLOWERS: 'Plantes et fleurs',
                 SEEDS: 'Graines et semences',
@@ -288,6 +318,7 @@ export const products = {
                 MISCELLANEOUS: 'Divers',
                 MUSICAL_INSTRUMENTS: 'Instruments de musique',
                 OFFICE_SUPPLIES: 'Fournitures de bureau',
+                OTHER: 'Autre',
                 OUTDOOR_GAMES: 'Jeux de plein air',
                 PET_SUPPLIES: 'Articles pour animaux',
                 RELIGIOUS_ITEMS: 'Articles religieux',
@@ -299,7 +330,20 @@ export const products = {
 }
 
 /** List of product category keys */
-export const categoriesList = Object.keys(
+export const categoriesList = Object.keys(products.categories).sort((a, b) =>
+    a.localeCompare(b),
+) as (keyof typeof products.categories)[]
+
+/** List of all product subCategory keys */
+export const subcategoriesList = Object.values(products.categories).flatMap(
+    (category) =>
+        Object.keys(category.subcategories).map((key) =>
+            key.replaceAll('_', ' '),
+        ),
+)
+
+/** List of product subCategory keys */
+export const subCategoriesList = Object.keys(
     products.categories,
 ) as (keyof typeof products.categories)[]
 

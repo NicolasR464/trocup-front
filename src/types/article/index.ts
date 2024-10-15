@@ -1,6 +1,10 @@
 import { z } from 'zod'
 
 import { CategoryEnumSchema, SubcategoryEnumSchema } from './categories'
+import {
+    categoriesList,
+    subcategoriesList,
+} from '@/utils/constants/translations'
 
 /**
  * @description Schema for dimensions
@@ -129,8 +133,8 @@ export const ArticleSchema = z.object({
     imageUrls: z.array(z.string().url()),
     createdAt: z.date(),
     lastModified: z.date(),
-    category: CategoryEnumSchema,
-    subCategory: SubcategoryEnumSchema,
+    category: z.enum([...categoriesList] as [string, ...string[]]),
+    subCategory: z.enum([...subcategoriesList] as [string, ...string[]]),
     deliveryType: DeliveryTypeSchema,
     dimensions: DimensionsSchema.optional(),
 })
