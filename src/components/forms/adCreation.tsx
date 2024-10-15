@@ -29,9 +29,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/shadcn/ui/radio-group'
 import {
     Select,
     SelectContent,
-    SelectGroup,
     SelectItem,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from '@/components/shadcn/ui/select'
@@ -41,7 +39,12 @@ import { cn } from '@/components/shadcn/utils'
 import { useArticleStore } from '@/stores/article'
 import { useUserStore } from '@/stores/user'
 import { getAddressSuggestions } from '@/utils/apiCalls/thirdPartyApis/addressSuggestions'
-import { translations } from '@/utils/constants'
+import {
+    deliveryTypes,
+    products,
+    productStates,
+    productStatus,
+} from '@/utils/constants/translations'
 
 import type { AddressSuggestion } from '@/types/address/gouvApiCall'
 import { DeliveryTypeSchema, StateSchema, StatusSchema } from '@/types/article'
@@ -69,8 +72,6 @@ const ArticleForm = (): React.JSX.Element => {
 
     const { address: storedAddresses } = useUserStore((state) => state.user)
 
-    console.log(storedAddresses)
-
     const analyzedImage = useArticleStore((state) => state.analysedImage)
 
     const form = useForm<ArticleFormData>({
@@ -84,7 +85,7 @@ const ArticleForm = (): React.JSX.Element => {
             purchaseDate: undefined,
             state: undefined,
             status: 'AVAILABLE',
-            category: undefined,
+            category: '',
             subCategory: undefined,
             size: undefined,
             deliveryType: undefined,
@@ -110,14 +111,13 @@ const ArticleForm = (): React.JSX.Element => {
         },
     })
 
-    // Watch user inputs
-    const addressObject = watch('addressObject')
-    const addressInput = watch('addressInput')
-    const savedUserAddressLabel = watch('savedUserAddressLabel')
+    // Watch user inputs dynamically
+    const addressObjectWatch = watch('addressObject')
+    const addressInputWatch = watch('addressInput')
+    const savedUserAddressLabelWatch = watch('savedUserAddressLabel')
+    const categoryWatch = form.watch('category')
 
     const onSubmit = (data: ArticleFormData) => {
-        console.log('🚀 onSubmit')
-        console.log(data)
         /** @TODO : send the data to the API */
     }
 
@@ -130,7 +130,7 @@ const ArticleForm = (): React.JSX.Element => {
      * @returns {void}
      */
     const onError = (errors: FieldErrors<ArticleFormData>): void => {
-        console.log('Validation Errors:', errors)
+        console.error('Validation Errors:', errors)
     }
 
     /**
@@ -383,10 +383,7 @@ const ArticleForm = (): React.JSX.Element => {
                                                 key={state}
                                                 value={state}
                                             >
-                                                {
-                                                    translations.products
-                                                        .states[state]
-                                                }
+                                                {productStates[state]}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -419,10 +416,7 @@ const ArticleForm = (): React.JSX.Element => {
                                                 key={status}
                                                 value={status}
                                             >
-                                                {
-                                                    translations.products
-                                                        .status[status]
-                                                }
+                                                {productStatus[status]}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -457,10 +451,9 @@ const ArticleForm = (): React.JSX.Element => {
                                                     value={category}
                                                 >
                                                     {
-                                                        translations.products
-                                                            .categories[
+                                                        products.categories[
                                                             category
-                                                        ]
+                                                        ].tag
                                                     }
                                                 </SelectItem>
                                             ),
@@ -490,17 +483,17 @@ const ArticleForm = (): React.JSX.Element => {
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        {form.watch('category') &&
-                                            categories[
-                                                form.watch('category')
-                                            ].map((subCategory) => (
-                                                <SelectItem
-                                                    key={subCategory}
-                                                    value={subCategory}
-                                                >
-                                                    {subCategory}
-                                                </SelectItem>
-                                            ))}
+                                        {Object.entries(
+                                            products.categories[categoryWatch]
+                                                .subcategories,
+                                        ).map(([key, value]) => (
+                                            <SelectItem
+                                                key={key}
+                                                value={key}
+                                            >
+                                                {value}
+                                            </SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                             </FormItem>
@@ -532,10 +525,7 @@ const ArticleForm = (): React.JSX.Element => {
                                                 />
                                             </FormControl>
                                             <FormLabel className='font-normal'>
-                                                {
-                                                    translations.products
-                                                        .delivery.SHIPPING
-                                                }
+                                                {deliveryTypes.SHIPPING}
                                             </FormLabel>
                                         </FormItem>
                                         <FormItem className='flex items-center space-x-3 space-y-0'>
@@ -548,10 +538,7 @@ const ArticleForm = (): React.JSX.Element => {
                                                 />
                                             </FormControl>
                                             <FormLabel className='font-normal'>
-                                                {
-                                                    translations.products
-                                                        .delivery.PICKUP
-                                                }
+                                                {deliveryTypes.PICKUP}
                                             </FormLabel>
                                         </FormItem>
                                         <FormItem className='flex items-center space-x-3 space-y-0'>
@@ -564,10 +551,7 @@ const ArticleForm = (): React.JSX.Element => {
                                                 />
                                             </FormControl>
                                             <FormLabel className='font-normal'>
-                                                {
-                                                    translations.products
-                                                        .delivery.BOTH
-                                                }
+                                                {deliveryTypes.BOTH}
                                             </FormLabel>
                                         </FormItem>
                                     </RadioGroup>
@@ -708,7 +692,7 @@ const ArticleForm = (): React.JSX.Element => {
                                                 )}
                                             </SelectContent>
                                         </Select>
-                                        {!!savedUserAddressLabel && (
+                                        {!!savedUserAddressLabelWatch && (
                                             <CircleX
                                                 className='ml-2 h-6 w-6 shrink-0 cursor-pointer text-red-500'
                                                 onClick={() => {
@@ -770,35 +754,35 @@ const ArticleForm = (): React.JSX.Element => {
                                                     }}
                                                 >
                                                     {!!field.value &&
-                                                        !!addressObject &&
+                                                        !!addressObjectWatch &&
                                                         Object.keys(
-                                                            addressObject,
+                                                            addressObjectWatch,
                                                         ).length === 0 &&
                                                         field.value}
-                                                    {!!addressObject &&
+                                                    {!!addressObjectWatch &&
                                                         Object.keys(
-                                                            addressObject,
+                                                            addressObjectWatch,
                                                         ).length > 0 &&
-                                                        addressObject.label}
+                                                        addressObjectWatch.label}
                                                     {!field.value &&
-                                                        !!addressObject &&
+                                                        !!addressObjectWatch &&
                                                         Object.keys(
-                                                            addressObject,
+                                                            addressObjectWatch,
                                                         ).length === 0 &&
                                                         'Rentre ton adresse'}
 
-                                                    {!!addressObject &&
+                                                    {!!addressObjectWatch &&
                                                         Object.keys(
-                                                            addressObject,
+                                                            addressObjectWatch,
                                                         ).length > 0 && (
                                                             <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                                                         )}
                                                 </Button>
                                             </FormControl>
                                         </PopoverTrigger>
-                                        {!!addressObject &&
-                                            Object.keys(addressObject).length >
-                                                0 && (
+                                        {!!addressObjectWatch &&
+                                            Object.keys(addressObjectWatch)
+                                                .length > 0 && (
                                                 <CircleX
                                                     className='ml-2 h-6 w-6 shrink-0 cursor-pointer text-red-500'
                                                     onClick={() => {
@@ -835,8 +819,9 @@ const ArticleForm = (): React.JSX.Element => {
                                             />
                                             <CommandList>
                                                 <CommandEmpty>
-                                                    {addressInput &&
-                                                    addressInput.length > 3 ? (
+                                                    {addressInputWatch &&
+                                                    addressInputWatch.length >
+                                                        3 ? (
                                                         'Aucune adresse trouvée'
                                                     ) : (
                                                         <div className='flex justify-center'>
