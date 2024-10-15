@@ -10,7 +10,7 @@ export const products = {
                 JACKETS: 'Vestes',
                 JEANS: 'Jeans',
                 PAJAMAS: 'Pyjamas',
-                PANTS: 'Pantalons',
+                TROUSERS: 'Pantalons',
                 SHIRTS: 'Chemises',
                 SKIRTS: 'Jupes',
                 SOCKS: 'Chaussettes',
@@ -297,6 +297,11 @@ export const products = {
         },
     },
 }
+
+/** List of product category keys */
+export const categoriesList = Object.keys(
+    products.categories,
+) as (keyof typeof products.categories)[]
 
 /** Object containing translations for product states */
 export const productStates = {

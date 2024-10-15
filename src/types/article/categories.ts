@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 export const categories = {
     CLOTHING: [
         'T_SHIRTS',

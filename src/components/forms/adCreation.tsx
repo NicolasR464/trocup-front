@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-handler-names */
 'use client'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import type { FieldErrors } from 'react-hook-form'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -40,6 +40,7 @@ import { useArticleStore } from '@/stores/article'
 import { useUserStore } from '@/stores/user'
 import { getAddressSuggestions } from '@/utils/apiCalls/thirdPartyApis/addressSuggestions'
 import {
+    categoriesList,
     deliveryTypes,
     products,
     productStates,
@@ -48,7 +49,7 @@ import {
 
 import type { AddressSuggestion } from '@/types/address/gouvApiCall'
 import { DeliveryTypeSchema, StateSchema, StatusSchema } from '@/types/article'
-import { categories, CategoryEnumSchema } from '@/types/article/categories'
+import { CategoryEnumSchema } from '@/types/article/categories'
 import type { ArticleFormData } from '@/types/formValidations/adCreation'
 import { ArticleFormDataSchema } from '@/types/formValidations/adCreation'
 
@@ -70,9 +71,11 @@ import {
 const ArticleForm = (): React.JSX.Element => {
     const [newAddressOpen, setNewAddressOpen] = useState(false)
 
+    // Data stored in Zustand stores
     const { address: storedAddresses } = useUserStore((state) => state.user)
-
     const analyzedImage = useArticleStore((state) => state.analysedImage)
+
+    console.log(analyzedImage)
 
     const form = useForm<ArticleFormData>({
         resolver: zodResolver(ArticleFormDataSchema),
@@ -85,8 +88,10 @@ const ArticleForm = (): React.JSX.Element => {
             purchaseDate: undefined,
             state: undefined,
             status: 'AVAILABLE',
-            category: '',
+            category: undefined,
+            categoryPrefill: undefined,
             subCategory: undefined,
+            subCategoryPrefill: undefined,
             size: undefined,
             deliveryType: undefined,
             dimensions: {
@@ -111,11 +116,28 @@ const ArticleForm = (): React.JSX.Element => {
         },
     })
 
+    // Set prefilled values from the analyzed image
+    useEffect(() => {
+        // Prefill brand
+        setValue('brand', analyzedImage.brand)
+
+        for (const tag of analyzedImage.tags) {
+            const categoryFound = categoriesList.find((cat) =>
+                cat.startsWith(tag.toUpperCase()),
+            )
+            if (categoryFound) {
+                setValue('categoryPrefill', categoryFound)
+                break
+            }
+        }
+    }, [analyzedImage, setValue])
+
     // Watch user inputs dynamically
     const addressObjectWatch = watch('addressObject')
     const addressInputWatch = watch('addressInput')
     const savedUserAddressLabelWatch = watch('savedUserAddressLabel')
     const categoryWatch = form.watch('category')
+    const categoryPrefillWatch = form.watch('categoryPrefill')
 
     const onSubmit = (data: ArticleFormData) => {
         /** @TODO : send the data to the API */
@@ -229,6 +251,87 @@ const ArticleForm = (): React.JSX.Element => {
                                         {...field}
                                     />
                                 </FormControl>
+                            </FormItem>
+                        )}
+                    />
+
+                    {/* Category Select */}
+                    <FormField
+                        control={control}
+                        name='category'
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className='text-lg font-semibold'>
+                                    {'Catégorie'}
+                                </FormLabel>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    value={categoryPrefillWatch ?? field.value}
+                                    defaultValue={categoryPrefillWatch ?? ''}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder='Selectionne une categorie' />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {CategoryEnumSchema.options.map(
+                                            (category) => (
+                                                <SelectItem
+                                                    key={category}
+                                                    value={category}
+                                                >
+                                                    {
+                                                        products.categories[
+                                                            category
+                                                        ].tag
+                                                    }
+                                                </SelectItem>
+                                            ),
+                                        )}
+                                    </SelectContent>
+                                </Select>
+                            </FormItem>
+                        )}
+                    />
+
+                    {JSON.stringify(categoryPrefillWatch)}
+                    {/* Subcategory Select */}
+                    <FormField
+                        control={control}
+                        name='subCategory'
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className='text-lg font-semibold'>
+                                    {'Sous-catégorie'}
+                                </FormLabel>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={
+                                        categoryPrefillWatch ?? field.value
+                                    }
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder='Sélectionner une sous-catégorie' />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {!!categoryWatch &&
+                                            Object.entries(
+                                                products.categories[
+                                                    categoryWatch
+                                                ].subcategories,
+                                            ).map(([key, value]) => (
+                                                <SelectItem
+                                                    key={key}
+                                                    value={key}
+                                                >
+                                                    {value}
+                                                </SelectItem>
+                                            ))}
+                                    </SelectContent>
+                                </Select>
                             </FormItem>
                         )}
                     />
@@ -417,81 +520,6 @@ const ArticleForm = (): React.JSX.Element => {
                                                 value={status}
                                             >
                                                 {productStatus[status]}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </FormItem>
-                        )}
-                    />
-
-                    {/* Category Select */}
-                    <FormField
-                        control={control}
-                        name='category'
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className='text-lg font-semibold'>
-                                    {'Catégorie'}
-                                </FormLabel>
-                                <Select
-                                    onValueChange={field.onChange}
-                                    defaultValue={field.value}
-                                >
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder='Select category' />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {CategoryEnumSchema.options.map(
-                                            (category) => (
-                                                <SelectItem
-                                                    key={category}
-                                                    value={category}
-                                                >
-                                                    {
-                                                        products.categories[
-                                                            category
-                                                        ].tag
-                                                    }
-                                                </SelectItem>
-                                            ),
-                                        )}
-                                    </SelectContent>
-                                </Select>
-                            </FormItem>
-                        )}
-                    />
-
-                    {/* Subcategory Select */}
-                    <FormField
-                        control={control}
-                        name='subCategory'
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className='text-lg font-semibold'>
-                                    {'Sous-catégorie'}
-                                </FormLabel>
-                                <Select
-                                    onValueChange={field.onChange}
-                                    defaultValue={field.value}
-                                >
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder='Sélectionner une sous-catégorie' />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {Object.entries(
-                                            products.categories[categoryWatch]
-                                                .subcategories,
-                                        ).map(([key, value]) => (
-                                            <SelectItem
-                                                key={key}
-                                                value={key}
-                                            >
-                                                {value}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>

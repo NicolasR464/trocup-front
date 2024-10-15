@@ -80,7 +80,13 @@ const analyzeImageFromUrl = async (
     }
 
     if (result.body.tagsResult) {
-        for (let index = 0; index <= 3; index++) {
+        console.log('🚀 ~ result.body.tagsResult:')
+        console.log(result.body.tagsResult.values)
+        for (
+            let index = 0;
+            index <= 3 && index < result.body.tagsResult.values.length;
+            index++
+        ) {
             tags.push(result.body.tagsResult.values[index].name)
         }
     }
