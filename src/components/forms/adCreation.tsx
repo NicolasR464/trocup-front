@@ -1,6 +1,5 @@
 /* eslint-disable react/jsx-handler-names */
 'use client'
-
 import React, { useState } from 'react'
 import type { FieldErrors } from 'react-hook-form'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
@@ -39,6 +38,7 @@ import {
 import { Textarea } from '@/components/shadcn/ui/textarea'
 import { cn } from '@/components/shadcn/utils'
 
+import { useArticleStore } from '@/stores/article'
 import { useUserStore } from '@/stores/user'
 import { getAddressSuggestions } from '@/utils/apiCalls/thirdPartyApis/addressSuggestions'
 import { translations } from '@/utils/constants'
@@ -70,6 +70,8 @@ const ArticleForm = (): React.JSX.Element => {
     const { address: storedAddresses } = useUserStore((state) => state.user)
 
     console.log(storedAddresses)
+
+    const analyzedImage = useArticleStore((state) => state.analysedImage)
 
     const form = useForm<ArticleFormData>({
         resolver: zodResolver(ArticleFormDataSchema),
@@ -169,6 +171,7 @@ const ArticleForm = (): React.JSX.Element => {
                 onSubmit={handleSubmit(onSubmit, onError)}
                 className='mx-auto max-w-4xl space-y-8 rounded-lg bg-white p-6 shadow-md'
             >
+                {JSON.stringify(analyzedImage)}
                 <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
                     {/* Ad Title Input */}
                     <Controller
@@ -531,7 +534,7 @@ const ArticleForm = (): React.JSX.Element => {
                                             <FormLabel className='font-normal'>
                                                 {
                                                     translations.products
-                                                        .delivery.PICKUP
+                                                        .delivery.SHIPPING
                                                 }
                                             </FormLabel>
                                         </FormItem>
@@ -547,7 +550,7 @@ const ArticleForm = (): React.JSX.Element => {
                                             <FormLabel className='font-normal'>
                                                 {
                                                     translations.products
-                                                        .delivery.SHIPPING
+                                                        .delivery.PICKUP
                                                 }
                                             </FormLabel>
                                         </FormItem>
@@ -664,9 +667,7 @@ const ArticleForm = (): React.JSX.Element => {
                             render={({ field }) => (
                                 <FormItem className={addressInputClass}>
                                     <FormLabel>
-                                        {
-                                            'Sélectionne une de tes adresses\u00A0: '
-                                        }
+                                        {'Sélectionne une adresse\u00A0: '}
                                     </FormLabel>
                                     <div className='flex items-center'>
                                         <Select
@@ -687,7 +688,9 @@ const ArticleForm = (): React.JSX.Element => {
                                                         'h-10',
                                                     )}
                                                 >
-                                                    <SelectValue placeholder='Choisis une adresse' />
+                                                    <SelectValue
+                                                        placeholder={<House />}
+                                                    />
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>

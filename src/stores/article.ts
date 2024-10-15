@@ -1,14 +1,14 @@
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 
-import type { ImageAnalysisResponse } from '@/utils/apiCalls/local'
+import type { ImageAnalysisSuccess } from '@/utils/apiCalls/local'
 
 import type { Article } from '@/types/article'
 
 type ArticleStore = {
-    analysedImage: ImageAnalysisResponse
+    analysedImage: ImageAnalysisSuccess
     article: Partial<Article>
-    setAnalyzedImage: (analysedImage: ImageAnalysisResponse) => void
+    setAnalyzedImage: (analysedImage: ImageAnalysisSuccess) => void
     setArticle: (article: Partial<Article>) => void
 }
 
@@ -28,7 +28,7 @@ export const useArticleStore = create<ArticleStore>()(
         },
         article: {},
 
-        setAnalyzedImage: (analysedImage: ImageAnalysisResponse): void => {
+        setAnalyzedImage: (analysedImage: ImageAnalysisSuccess): void => {
             set((state) => {
                 state.analysedImage = analysedImage
             })

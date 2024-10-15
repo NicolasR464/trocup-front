@@ -92,7 +92,7 @@ const analyzeImageFromUrl = async (
     }
 
     return {
-        message: 'Image analyzed successfully',
+        message: 'Image analyzed successfully.',
         content: objectData,
     }
 }
@@ -136,7 +136,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 
     console.log('✅ Cloudinary')
 
-    // STEP#2 : Analyze the image with Azure Cognitive Services 🔥
+    // STEP#2 : Analyze the image with Azure Cognitive Services
 
     const azureEndpoint: string = environment.AZURE_COGNITIVE_SERVICES_ENDPOINT
     const azureKey: string = environment.AZURE_COGNITIVE_SERVICES_KEY
@@ -155,10 +155,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
         azureFeatures,
     )
 
-    return NextResponse.json({
-        message: 'Image analyzed successfully',
-        data: azureAnalysis,
-    })
+    return NextResponse.json(azureAnalysis)
 
     // STEP#3 : Send the data to Dataiku (To do on an other ticket)
 }

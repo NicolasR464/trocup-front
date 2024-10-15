@@ -36,7 +36,7 @@ export const StatusSchema = z.enum(['AVAILABLE', 'UNAVAILABLE', 'RESERVED'])
  * @description Schema for delivery type enum
  * @exports DeliveryTypeSchema
  */
-export const DeliveryTypeSchema = z.enum(['PICKUP', 'SHIPPING', 'BOTH'])
+export const DeliveryTypeSchema = z.enum(['SHIPPING', 'PICKUP', 'BOTH'])
 
 /**
  * @description Schema for garment size enum

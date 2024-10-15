@@ -6,10 +6,12 @@ import type { DragTypes, FileDropItem } from 'react-aria-components'
 import { DropZone } from 'react-aria-components'
 import Image from 'next/image'
 
+import { useArticleStore } from '@/stores/article'
 import type { ImageAnalysisSuccess } from '@/utils/apiCalls/local'
 import { useImageAnalysis } from '@/utils/apiCalls/local/mutations'
 
 import { Button } from '../shadcn/ui/button'
+import { log } from 'console'
 
 const getImageBlob = async (data: FileDropItem): Promise<File> => {
     const file = await data.getFile()
@@ -35,15 +37,24 @@ const ImageProcessing = (): React.JSX.Element => {
      */
     const handleFileChange = async (file: File): Promise<void> => {
         const imageUrl = URL.createObjectURL(file)
+        const { setAnalyzedImage } = useArticleStore.getState()
 
         setImage(imageUrl)
 
         await mutateAsync(
             { file },
             {
-                onSuccess: ({ data }) => {
+                onSuccess: (data) => {
+                    console.log('✅ mutate success')
+                    console.log('🔥', data)
+
                     if ('content' in data) {
+                        console.log(' in if condition 🔥', data)
+
                         setObjectData(data)
+
+                        // Store data in the store
+                        setAnalyzedImage(data.content)
                     }
                 },
                 onError: (error) => {
