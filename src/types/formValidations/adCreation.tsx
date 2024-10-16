@@ -15,16 +15,30 @@ export const ArticleFormDataSchema = ArticleSchema.pick({
     purchaseDate: true,
     dimensions: true,
     size: true,
-    state: true,
     status: true,
-    category: true,
-    subCategory: true,
-    deliveryType: true,
 }).extend({
-    adTitle: z.string().min(5, 'Le titre est requis'),
+    adTitle: z
+        .string({
+            required_error: 'Le titre est requis.',
+        })
+        .min(1, 'Le titre est requis.'),
+    category: z.string({
+        required_error: 'La catégorie est requise.',
+    }),
+    subCategory: z.string({
+        required_error: 'La sous-catégorie est requise.',
+    }),
+    deliveryType: z.string({
+        required_error: 'Le type de livraison est requis.',
+    }),
+    state: z.string({
+        required_error: 'L’état de l’objet est requis.',
+    }),
     description: z
-        .string()
-        .min(10, 'La description doit contenir au moins 10 caractères'),
+        .string({
+            required_error: 'La description est requise.',
+        })
+        .min(10, 'La description doit contenir au moins 10 caractères.'),
     /**
      * @description The label of the address chosen by the user from the list of saved addresses
      */

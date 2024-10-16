@@ -43,69 +43,6 @@ export const StatusSchema = z.enum(['AVAILABLE', 'UNAVAILABLE', 'RESERVED'])
 export const DeliveryTypeSchema = z.enum(['SHIPPING', 'PICKUP', 'BOTH'])
 
 /**
- * @description Schema for garment size enum
- * @exports GarmentSizeSchema
- */
-export const GarmentSizeSchema = z.enum(['XS', 'S', 'M', 'L', 'XL', 'XXL'])
-
-/**
- * @description Schema for shoe size enum
- * @exports ShoeSizeSchema
- */
-export const ShoeSizeSchema = z.enum([
-    '35',
-    '36',
-    '37',
-    '38',
-    '39',
-    '40',
-    '41',
-    '42',
-    '43',
-    '44',
-    '45',
-    '46',
-])
-
-/**
- * @description Schema for bra size enum
- * @exports BraSizeSchema
- */
-export const BraSizeSchema = z.enum([
-    '70A',
-    '70B',
-    '70C',
-    '70D',
-    '75A',
-    '75B',
-    '75C',
-    '75D',
-    '80A',
-    '80B',
-    '80C',
-    '80D',
-    '85A',
-    '85B',
-    '85C',
-    '85D',
-])
-
-/**
- * @description Schema for suit size enum
- * @exports SuitSizeSchema
- */
-export const SuitSizeSchema = z.enum([
-    '44',
-    '46',
-    '48',
-    '50',
-    '52',
-    '54',
-    '56',
-    '58',
-])
-
-/**
  * @description Schema for article
  * @exports ArticleSchema
  */
@@ -117,14 +54,7 @@ export const ArticleSchema = z.object({
     brand: z.string().optional(),
     model: z.string().optional(),
     description: z.string(),
-    size: z
-        .union([
-            BraSizeSchema,
-            GarmentSizeSchema,
-            SuitSizeSchema,
-            ShoeSizeSchema,
-        ])
-        .optional(),
+    size: z.string().optional(),
     price: z.number().positive(),
     manufactureDate: z.date().optional(),
     purchaseDate: z.date().optional(),
