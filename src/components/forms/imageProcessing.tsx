@@ -98,8 +98,6 @@ const ImageProcessing = (): React.JSX.Element => {
                         })
                 }}
             >
-                <div>{!dropped && 'Dépose une image ici'}</div>
-
                 {/** Image selection window */}
                 {!imageLoaded && (
                     <Button
@@ -119,7 +117,9 @@ const ImageProcessing = (): React.JSX.Element => {
                                 if (file) handleFileChange(file)
                             }}
                         />
-                        <span className='relative z-10'>{'ou clique ici'}</span>
+                        <span className='relative z-10'>
+                            {'Ajoute une image'}
+                        </span>
                     </Button>
                 )}
 

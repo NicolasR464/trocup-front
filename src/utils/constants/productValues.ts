@@ -330,9 +330,9 @@ export const products = {
 }
 
 /** List of product category keys */
-export const categoriesList = Object.keys(products.categories).sort((a, b) =>
-    a.localeCompare(b),
-) as (keyof typeof products.categories)[]
+export const categoriesList = Object.entries(products.categories)
+    .sort(([, a], [, b]) => a.tag.localeCompare(b.tag))
+    .map(([key]) => key) as (keyof typeof products.categories)[]
 
 /** List of all product subCategory keys */
 export const subcategoriesList = Object.values(products.categories).flatMap(
@@ -368,3 +368,67 @@ export const deliveryTypes = {
     SHIPPING: 'À l’envoi',
     BOTH: 'En main propre ou à l’envoi',
 }
+
+export const sizeOptions = [
+    { label: 'Vêtements', options: ['XS', 'S', 'M', 'L', 'XL', 'XXL'] },
+    {
+        label: 'Pantalons',
+        options: [
+            '32',
+            '34',
+            '36',
+            '38',
+            '40',
+            '42',
+            '44',
+            '48',
+            '50',
+            '52',
+            '54',
+            '56',
+            '58',
+        ],
+    },
+    {
+        label: 'Chaussures',
+        options: [
+            '35',
+            '36',
+            '37',
+            '38',
+            '39',
+            '40',
+            '41',
+            '42',
+            '43',
+            '44',
+            '45',
+            '46',
+        ],
+    },
+    {
+        label: 'Soutiens-gorge',
+        options: [
+            '70A',
+            '70B',
+            '70C',
+            '70D',
+            '75A',
+            '75B',
+            '75C',
+            '75D',
+            '80A',
+            '80B',
+            '80C',
+            '80D',
+            '85A',
+            '85B',
+            '85C',
+            '85D',
+        ],
+    },
+    {
+        label: 'Costumes',
+        options: ['44', '46', '48', '50', '52', '54', '56', '58'],
+    },
+]

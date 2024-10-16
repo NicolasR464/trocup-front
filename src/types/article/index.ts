@@ -4,7 +4,7 @@ import { CategoryEnumSchema, SubcategoryEnumSchema } from './categories'
 import {
     categoriesList,
     subcategoriesList,
-} from '@/utils/constants/translations'
+} from '@/utils/constants/productValues'
 
 /**
  * @description Schema for dimensions

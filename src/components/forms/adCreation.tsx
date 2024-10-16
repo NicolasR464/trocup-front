@@ -29,7 +29,9 @@ import { RadioGroup, RadioGroupItem } from '@/components/shadcn/ui/radio-group'
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
+    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from '@/components/shadcn/ui/select'
@@ -45,8 +47,8 @@ import {
     products,
     productStates,
     productStatus,
-    subcategoriesList,
-} from '@/utils/constants/translations'
+    sizeOptions,
+} from '@/utils/constants/productValues'
 
 import type { AddressSuggestion } from '@/types/address/gouvApiCall'
 import { DeliveryTypeSchema, StateSchema, StatusSchema } from '@/types/article'
@@ -175,21 +177,11 @@ const ArticleForm = (): React.JSX.Element => {
                         subCategoryFound[0].replaceAll(' ', '_'),
                     )
 
-                    console.log('subCategoryWatch 🔥', subCategoryWatch)
                     break
                 }
             }
         }
     }, [analyzedImage, reset, setValue, categoryWatch])
-
-    // Separate useEffects to log updates
-    useEffect(() => {
-        console.log('categoryWatch updated:', categoryWatch)
-    }, [categoryWatch])
-
-    useEffect(() => {
-        console.log('subCategoryWatch updated:', subCategoryWatch)
-    }, [subCategoryWatch])
 
     /**
      * Handles the form submission.
@@ -248,7 +240,6 @@ const ArticleForm = (): React.JSX.Element => {
                 onSubmit={handleSubmit(onSubmit, onError)}
                 className='mx-auto max-w-4xl space-y-8 rounded-lg bg-white p-6 shadow-md'
             >
-                {JSON.stringify(analyzedImage)}
                 <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
                     {/* Ad Title Input */}
                     <Controller
@@ -310,7 +301,6 @@ const ArticleForm = (): React.JSX.Element => {
                         )}
                     />
 
-                    {JSON.stringify(categoryWatch)}
                     {/* Category Select */}
                     <FormField
                         control={control}
@@ -327,7 +317,7 @@ const ArticleForm = (): React.JSX.Element => {
                                 >
                                     <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder='Selectionne une categorie' />
+                                            <SelectValue placeholder='Sélectionne une categorie' />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
@@ -349,7 +339,6 @@ const ArticleForm = (): React.JSX.Element => {
                         )}
                     />
 
-                    {JSON.stringify(subCategoryWatch)}
                     {/* Subcategory Select */}
                     <FormField
                         control={control}
@@ -366,7 +355,7 @@ const ArticleForm = (): React.JSX.Element => {
                                 >
                                     <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder='Sélectionner une sous-catégorie' />
+                                            <SelectValue placeholder='Sélectionne une sous-catégorie' />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
@@ -375,14 +364,18 @@ const ArticleForm = (): React.JSX.Element => {
                                                 products.categories[
                                                     categoryWatch as keyof typeof products.categories
                                                 ].subcategories,
-                                            ).map(([key, value]) => (
-                                                <SelectItem
-                                                    key={key}
-                                                    value={key}
-                                                >
-                                                    {value}
-                                                </SelectItem>
-                                            ))}
+                                            )
+                                                .sort(([, a], [, b]) =>
+                                                    a.localeCompare(b),
+                                                )
+                                                .map(([key, value]) => (
+                                                    <SelectItem
+                                                        key={key}
+                                                        value={key}
+                                                    >
+                                                        {value}
+                                                    </SelectItem>
+                                                ))}
                                     </SelectContent>
                                 </Select>
                             </FormItem>
@@ -581,67 +574,6 @@ const ArticleForm = (): React.JSX.Element => {
                         )}
                     />
 
-                    {/* Delivery Type Checkboxes */}
-                    <FormField
-                        control={control}
-                        name='deliveryType'
-                        render={({ field }) => (
-                            <FormItem className='space-y-3'>
-                                <FormLabel className='text-lg font-semibold'>
-                                    {'Type de livraison'}
-                                </FormLabel>
-                                <FormControl>
-                                    <RadioGroup
-                                        onValueChange={field.onChange}
-                                        defaultValue={field.value}
-                                        className='flex flex-col space-y-1'
-                                    >
-                                        <FormItem className='flex items-center space-x-3 space-y-0'>
-                                            <FormControl>
-                                                <RadioGroupItem
-                                                    value={
-                                                        DeliveryTypeSchema
-                                                            .options[0]
-                                                    }
-                                                />
-                                            </FormControl>
-                                            <FormLabel className='font-normal'>
-                                                {deliveryTypes.SHIPPING}
-                                            </FormLabel>
-                                        </FormItem>
-                                        <FormItem className='flex items-center space-x-3 space-y-0'>
-                                            <FormControl>
-                                                <RadioGroupItem
-                                                    value={
-                                                        DeliveryTypeSchema
-                                                            .options[1]
-                                                    }
-                                                />
-                                            </FormControl>
-                                            <FormLabel className='font-normal'>
-                                                {deliveryTypes.PICKUP}
-                                            </FormLabel>
-                                        </FormItem>
-                                        <FormItem className='flex items-center space-x-3 space-y-0'>
-                                            <FormControl>
-                                                <RadioGroupItem
-                                                    value={
-                                                        DeliveryTypeSchema
-                                                            .options[2]
-                                                    }
-                                                />
-                                            </FormControl>
-                                            <FormLabel className='font-normal'>
-                                                {deliveryTypes.BOTH}
-                                            </FormLabel>
-                                        </FormItem>
-                                    </RadioGroup>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
                     {/* Dimensions of the article */}
                     <div className='flex w-[250px] flex-wrap justify-between'>
                         {/* Dimensions of the article : Length */}
@@ -721,255 +653,370 @@ const ArticleForm = (): React.JSX.Element => {
                             )}
                         />
                     </div>
-                </div>
 
-                {/** Saved user addresses */}
-                {!!storedAddresses && storedAddresses.length > 0 && (
-                    <div className='flex justify-center'>
-                        <FormField
-                            control={control}
-                            name='savedUserAddressLabel'
-                            render={({ field }) => (
-                                <FormItem className={addressInputClass}>
-                                    <FormLabel>
-                                        {
-                                            'Sélectionne une adresse enregistrée\u00A0: '
-                                        }
-                                    </FormLabel>
-                                    <div className='flex items-center'>
-                                        <Select
-                                            onValueChange={(value) => {
-                                                setValue(
-                                                    'addressObject',
-                                                    undefined,
-                                                )
-                                                field.onChange(value)
-                                            }}
-                                            value={field.value ?? ''}
-                                        >
-                                            <FormControl>
-                                                <SelectTrigger
-                                                    className={cn(
-                                                        addressInputClass,
-                                                        'justify-between',
-                                                        'h-10',
-                                                    )}
-                                                >
-                                                    <SelectValue
-                                                        placeholder={<House />}
-                                                    />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {storedAddresses.map(
-                                                    (address) => (
-                                                        <SelectItem
-                                                            key={address.label}
-                                                            value={
-                                                                address.label
-                                                            }
-                                                        >
-                                                            {address.label}
-                                                        </SelectItem>
-                                                    ),
-                                                )}
-                                            </SelectContent>
-                                        </Select>
-                                        {!!savedUserAddressLabelWatch && (
-                                            <CircleX
-                                                className='ml-2 h-6 w-6 shrink-0 cursor-pointer text-red-500'
-                                                onClick={() => {
-                                                    setValue(
-                                                        'savedUserAddressLabel',
-                                                        undefined,
-                                                    )
-                                                }}
-                                            />
-                                        )}
-                                    </div>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                )}
-
-                {/** Article Address */}
-                <div className='flex justify-center'>
+                    {/** Size */}
                     <FormField
                         control={control}
-                        name='addressInput'
+                        name='size'
                         render={({ field }) => (
-                            <FormItem
-                                className={`flex flex-col ${addressInputClass}`}
-                            >
-                                <FormLabel className='w-full'>
-                                    {!!storedAddresses &&
-                                    storedAddresses.length > 0
-                                        ? 'Ou rajoute une nouvelle adresse :'
-                                        : 'Rajoute une nouvelle adresse :'}
+                            <FormItem>
+                                <FormLabel className='text-lg font-semibold'>
+                                    {'Taille'}
                                 </FormLabel>
-                                <Popover
-                                    open={newAddressOpen}
-                                    onOpenChange={setNewAddressOpen}
-                                >
-                                    <div className='flex items-center'>
-                                        <PopoverTrigger asChild>
-                                            <FormControl>
-                                                <Button
-                                                    variant='outline'
-                                                    role='combobox'
-                                                    aria-expanded={
-                                                        newAddressOpen
-                                                    }
-                                                    className={cn(
-                                                        addressInputClass,
-                                                        'justify-between',
-                                                        !field.value &&
-                                                            'text-muted-foreground',
+                                {/* ... RadioGroup code ... */}
+                                <FormControl>
+                                    <Select
+                                        onValueChange={field.onChange}
+                                        defaultValue={field.value}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder='Sélectionner une taille' />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {sizeOptions.map((group) => (
+                                                <SelectGroup key={group.label}>
+                                                    <SelectLabel>
+                                                        {group.label}
+                                                    </SelectLabel>
+                                                    {group.options.map(
+                                                        (size) => (
+                                                            <SelectItem
+                                                                key={size}
+                                                                value={size}
+                                                            >
+                                                                {size}
+                                                            </SelectItem>
+                                                        ),
                                                     )}
-                                                    onClick={() => {
-                                                        if (!newAddressOpen) {
-                                                            setNewAddressOpen(
-                                                                true,
-                                                            )
-                                                        }
-                                                    }}
-                                                >
-                                                    {!!field.value &&
-                                                        !!addressObjectWatch &&
-                                                        Object.keys(
-                                                            addressObjectWatch,
-                                                        ).length === 0 &&
-                                                        field.value}
-                                                    {!!addressObjectWatch &&
-                                                        Object.keys(
-                                                            addressObjectWatch,
-                                                        ).length > 0 &&
-                                                        addressObjectWatch.label}
-                                                    {!field.value &&
-                                                        !!addressObjectWatch &&
-                                                        Object.keys(
-                                                            addressObjectWatch,
-                                                        ).length === 0 &&
-                                                        'Rentre ton adresse'}
+                                                </SelectGroup>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                            </FormItem>
+                        )}
+                    />
 
-                                                    {!!addressObjectWatch &&
-                                                        Object.keys(
-                                                            addressObjectWatch,
-                                                        ).length > 0 && (
-                                                            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                    {/** Address */}
+
+                    {/** Saved user addresses */}
+                    {!!storedAddresses && storedAddresses.length > 0 && (
+                        <div className='flex justify-center'>
+                            <FormField
+                                control={control}
+                                name='savedUserAddressLabel'
+                                render={({ field }) => (
+                                    <FormItem className={addressInputClass}>
+                                        <FormLabel>
+                                            {
+                                                'Sélectionne une adresse enregistrée\u00A0: '
+                                            }
+                                        </FormLabel>
+                                        <div className='flex items-center'>
+                                            <Select
+                                                onValueChange={(value) => {
+                                                    setValue(
+                                                        'addressObject',
+                                                        undefined,
+                                                    )
+                                                    field.onChange(value)
+                                                }}
+                                                value={field.value ?? ''}
+                                            >
+                                                <FormControl>
+                                                    <SelectTrigger
+                                                        className={cn(
+                                                            addressInputClass,
+                                                            'justify-between',
                                                         )}
-                                                </Button>
-                                            </FormControl>
-                                        </PopoverTrigger>
-                                        {!!addressObjectWatch &&
-                                            Object.keys(addressObjectWatch)
-                                                .length > 0 && (
+                                                    >
+                                                        <SelectValue
+                                                            placeholder={
+                                                                <House />
+                                                            }
+                                                        />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {storedAddresses.map(
+                                                        (address) => (
+                                                            <SelectItem
+                                                                key={
+                                                                    address.label
+                                                                }
+                                                                value={
+                                                                    address.label
+                                                                }
+                                                            >
+                                                                {address.label}
+                                                            </SelectItem>
+                                                        ),
+                                                    )}
+                                                </SelectContent>
+                                            </Select>
+                                            {!!savedUserAddressLabelWatch && (
                                                 <CircleX
                                                     className='ml-2 h-6 w-6 shrink-0 cursor-pointer text-red-500'
                                                     onClick={() => {
                                                         setValue(
-                                                            'addressObject',
+                                                            'savedUserAddressLabel',
                                                             undefined,
                                                         )
-                                                        setNewAddressOpen(false)
                                                     }}
                                                 />
                                             )}
-                                    </div>
+                                        </div>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    )}
 
-                                    <PopoverContent className='w-[300px] p-0'>
-                                        <Command>
-                                            <CommandInput
-                                                value={field.value}
-                                                placeholder='Cherche une nouvelle adresse'
-                                                onValueChange={(value) => {
-                                                    const sanitizedValue =
-                                                        value.replaceAll(
-                                                            ',',
-                                                            '',
+                    {/** Article Address */}
+                    <div className='mt-[9px] flex justify-center'>
+                        <FormField
+                            control={control}
+                            name='addressInput'
+                            render={({ field }) => (
+                                <FormItem
+                                    className={`flex flex-col ${addressInputClass} `}
+                                >
+                                    <FormLabel className='w-full'>
+                                        {!!storedAddresses &&
+                                        storedAddresses.length > 0
+                                            ? 'Ou rajoute une nouvelle adresse :'
+                                            : 'Rajoute une nouvelle adresse :'}
+                                    </FormLabel>
+                                    <Popover
+                                        open={newAddressOpen}
+                                        onOpenChange={setNewAddressOpen}
+                                    >
+                                        <div className='flex items-center'>
+                                            <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                        variant='outline'
+                                                        role='combobox'
+                                                        aria-expanded={
+                                                            newAddressOpen
+                                                        }
+                                                        className={cn(
+                                                            addressInputClass,
+                                                            'justify-between',
+                                                            !field.value &&
+                                                                'text-muted-foreground',
+                                                        )}
+                                                        onClick={() => {
+                                                            if (
+                                                                !newAddressOpen
+                                                            ) {
+                                                                setNewAddressOpen(
+                                                                    true,
+                                                                )
+                                                            }
+                                                        }}
+                                                    >
+                                                        {!!field.value &&
+                                                            !!addressObjectWatch &&
+                                                            Object.keys(
+                                                                addressObjectWatch,
+                                                            ).length === 0 &&
+                                                            field.value}
+                                                        {!!addressObjectWatch &&
+                                                            Object.keys(
+                                                                addressObjectWatch,
+                                                            ).length > 0 &&
+                                                            addressObjectWatch.label}
+                                                        {!field.value &&
+                                                            !!addressObjectWatch &&
+                                                            Object.keys(
+                                                                addressObjectWatch,
+                                                            ).length === 0 &&
+                                                            'Rentre ton adresse'}
+
+                                                        {!!addressObjectWatch &&
+                                                            Object.keys(
+                                                                addressObjectWatch,
+                                                            ).length > 0 && (
+                                                                <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                                                            )}
+                                                    </Button>
+                                                </FormControl>
+                                            </PopoverTrigger>
+                                            {!!addressObjectWatch &&
+                                                Object.keys(addressObjectWatch)
+                                                    .length > 0 && (
+                                                    <CircleX
+                                                        className='ml-2 h-6 w-6 shrink-0 cursor-pointer text-red-500'
+                                                        onClick={() => {
+                                                            setValue(
+                                                                'addressObject',
+                                                                undefined,
+                                                            )
+                                                            setNewAddressOpen(
+                                                                false,
+                                                            )
+                                                        }}
+                                                    />
+                                                )}
+                                        </div>
+
+                                        <PopoverContent className='w-[300px] p-0'>
+                                            <Command>
+                                                <CommandInput
+                                                    value={field.value}
+                                                    placeholder='Cherche une nouvelle adresse'
+                                                    onValueChange={(value) => {
+                                                        const sanitizedValue =
+                                                            value.replaceAll(
+                                                                ',',
+                                                                '',
+                                                            )
+
+                                                        field.onChange(
+                                                            sanitizedValue,
                                                         )
 
-                                                    field.onChange(
-                                                        sanitizedValue,
-                                                    )
+                                                        fetchAddressSuggestions(
+                                                            sanitizedValue,
+                                                        )
+                                                    }}
+                                                />
+                                                <CommandList>
+                                                    <CommandEmpty>
+                                                        {addressInputWatch &&
+                                                        addressInputWatch.length >
+                                                            3 ? (
+                                                            'Aucune adresse trouvée'
+                                                        ) : (
+                                                            <div className='flex justify-center'>
+                                                                <House />
+                                                            </div>
+                                                        )}
+                                                    </CommandEmpty>
 
-                                                    fetchAddressSuggestions(
-                                                        sanitizedValue,
-                                                    )
-                                                }}
-                                            />
-                                            <CommandList>
-                                                <CommandEmpty>
-                                                    {addressInputWatch &&
-                                                    addressInputWatch.length >
-                                                        3 ? (
-                                                        'Aucune adresse trouvée'
-                                                    ) : (
-                                                        <div className='flex justify-center'>
-                                                            <House />
-                                                        </div>
-                                                    )}
-                                                </CommandEmpty>
-
-                                                <CommandGroup>
-                                                    {fields.map(
-                                                        (suggestion, index) => (
-                                                            <CommandItem
-                                                                className='cursor-pointer'
-                                                                key={
-                                                                    suggestion.id
-                                                                }
-                                                                value={
-                                                                    suggestion
-                                                                        .properties
-                                                                        .label
-                                                                }
-                                                                onSelect={() => {
-                                                                    setValue(
-                                                                        'addressObject',
-                                                                        {
-                                                                            ...suggestion.properties,
-                                                                            label: suggestion
-                                                                                .properties
-                                                                                .label,
-                                                                        },
-                                                                    )
-                                                                    setNewAddressOpen(
-                                                                        false,
-                                                                    )
-
-                                                                    setValue(
-                                                                        'savedUserAddressLabel',
-                                                                        undefined,
-                                                                    )
-                                                                }}
-                                                            >
-                                                                <span
-                                                                    {...register(
-                                                                        `addressSuggestions.${index}.properties.label`,
-                                                                    )}
-                                                                >
-                                                                    {
+                                                    <CommandGroup>
+                                                        {fields.map(
+                                                            (
+                                                                suggestion,
+                                                                index,
+                                                            ) => (
+                                                                <CommandItem
+                                                                    className='cursor-pointer'
+                                                                    key={
+                                                                        suggestion.id
+                                                                    }
+                                                                    value={
                                                                         suggestion
                                                                             .properties
                                                                             .label
                                                                     }
-                                                                </span>
-                                                            </CommandItem>
-                                                        ),
-                                                    )}
-                                                </CommandGroup>
-                                            </CommandList>
-                                        </Command>
-                                    </PopoverContent>
-                                </Popover>
+                                                                    onSelect={() => {
+                                                                        setValue(
+                                                                            'addressObject',
+                                                                            {
+                                                                                ...suggestion.properties,
+                                                                                label: suggestion
+                                                                                    .properties
+                                                                                    .label,
+                                                                            },
+                                                                        )
+                                                                        setNewAddressOpen(
+                                                                            false,
+                                                                        )
+
+                                                                        setValue(
+                                                                            'savedUserAddressLabel',
+                                                                            undefined,
+                                                                        )
+                                                                    }}
+                                                                >
+                                                                    <span
+                                                                        {...register(
+                                                                            `addressSuggestions.${index}.properties.label`,
+                                                                        )}
+                                                                    >
+                                                                        {
+                                                                            suggestion
+                                                                                .properties
+                                                                                .label
+                                                                        }
+                                                                    </span>
+                                                                </CommandItem>
+                                                            ),
+                                                        )}
+                                                    </CommandGroup>
+                                                </CommandList>
+                                            </Command>
+                                        </PopoverContent>
+                                    </Popover>
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+
+                    {/* Delivery Type Checkboxes */}
+                    <FormField
+                        control={control}
+                        name='deliveryType'
+                        render={({ field }) => (
+                            <FormItem className='space-y-3'>
+                                <FormLabel className='text-lg font-semibold'>
+                                    {'Type de livraison'}
+                                </FormLabel>
+                                <FormControl>
+                                    <RadioGroup
+                                        onValueChange={field.onChange}
+                                        defaultValue={field.value}
+                                        className='flex flex-col space-y-1'
+                                    >
+                                        <FormItem className='flex items-center space-x-3 space-y-0'>
+                                            <FormControl>
+                                                <RadioGroupItem
+                                                    value={
+                                                        DeliveryTypeSchema
+                                                            .options[0]
+                                                    }
+                                                />
+                                            </FormControl>
+                                            <FormLabel className='font-normal'>
+                                                {deliveryTypes.SHIPPING}
+                                            </FormLabel>
+                                        </FormItem>
+                                        <FormItem className='flex items-center space-x-3 space-y-0'>
+                                            <FormControl>
+                                                <RadioGroupItem
+                                                    value={
+                                                        DeliveryTypeSchema
+                                                            .options[1]
+                                                    }
+                                                />
+                                            </FormControl>
+                                            <FormLabel className='font-normal'>
+                                                {deliveryTypes.PICKUP}
+                                            </FormLabel>
+                                        </FormItem>
+                                        <FormItem className='flex items-center space-x-3 space-y-0'>
+                                            <FormControl>
+                                                <RadioGroupItem
+                                                    value={
+                                                        DeliveryTypeSchema
+                                                            .options[2]
+                                                    }
+                                                />
+                                            </FormControl>
+                                            <FormLabel className='font-normal'>
+                                                {deliveryTypes.BOTH}
+                                            </FormLabel>
+                                        </FormItem>
+                                    </RadioGroup>
+                                </FormControl>
+                                <FormMessage />
                             </FormItem>
                         )}
                     />
                 </div>
-
                 <Button
                     type='submit'
                     className='w-full md:w-auto'

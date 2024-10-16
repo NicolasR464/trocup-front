@@ -27,12 +27,16 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                             type='button'
                             className='flex flex-1 items-center justify-center px-2 hover:bg-gray-100 focus:outline-none'
                             onClick={() => {
-                                const input = ref.current
-                                if (input) {
-                                    input.stepUp()
-                                    input.dispatchEvent(
-                                        new Event('input', { bubbles: true }),
-                                    )
+                                if (ref && 'current' in ref) {
+                                    const input = ref.current
+                                    if (input) {
+                                        input.stepUp()
+                                        input.dispatchEvent(
+                                            new Event('input', {
+                                                bubbles: true,
+                                            }),
+                                        )
+                                    }
                                 }
                             }}
                         >
@@ -42,12 +46,16 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                             type='button'
                             className='flex flex-1 items-center justify-center px-2 hover:bg-gray-100 focus:outline-none'
                             onClick={() => {
-                                const input = ref.current
-                                if (input) {
-                                    input.stepDown()
-                                    input.dispatchEvent(
-                                        new Event('input', { bubbles: true }),
-                                    )
+                                if (ref && 'current' in ref) {
+                                    const input = ref.current
+                                    if (input) {
+                                        input.stepDown()
+                                        input.dispatchEvent(
+                                            new Event('input', {
+                                                bubbles: true,
+                                            }),
+                                        )
+                                    }
                                 }
                             }}
                         >
