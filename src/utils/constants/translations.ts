@@ -79,8 +79,8 @@ export const products = {
                 WATCHES: 'Montres',
             },
         },
-        BABY_CLOTHING: {
-            tag: 'Vêtements de bébé',
+        BABY: {
+            tag: 'Bébé',
             subcategories: {
                 BABY_ACCESSORIES: 'Accessoires bébé',
                 BABY_FOOTWEAR: 'Chaussures bébé',
@@ -209,7 +209,7 @@ export const products = {
                 TELEVISIONS: 'Télévisions',
             },
         },
-        BICYCLES: {
+        BIKES: {
             tag: 'Vélos',
             subcategories: {
                 BIKE_ACCESSORIES: 'Accessoires vélo',

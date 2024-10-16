@@ -121,21 +121,22 @@ const ArticleForm = (): React.JSX.Element => {
     const categoryWatch = watch('category')
     const subCategoryWatch = watch('subCategory')
 
-    // Set prefilled values from the analyzed image
+    // Reset on image change
     useEffect(() => {
-        // reset({
-        //     brand: '',
-        //     category: undefined,
-        //     subCategory: undefined,
-        // })
+        reset()
+    }, [reset, analyzedImage])
 
-        // Prefill brand
+    // Prefill brand
+    useEffect(() => {
         setValue(
             'brand',
             analyzedImage.brand.charAt(0).toUpperCase() +
                 analyzedImage.brand.slice(1),
         )
+    }, [analyzedImage])
 
+    // Set prefilled category from the analyzed image
+    useEffect(() => {
         // Prefill category
         for (const tag of analyzedImage.tags) {
             const categoryFound = categoriesList.find(
@@ -143,7 +144,7 @@ const ArticleForm = (): React.JSX.Element => {
                     cat.includes(tag.toUpperCase()) ||
                     tag.toUpperCase().includes(cat),
             )
-            if (categoryFound && !categoryWatch) {
+            if (categoryFound) {
                 setValue('category', categoryFound)
 
                 break
@@ -151,29 +152,34 @@ const ArticleForm = (): React.JSX.Element => {
         }
     }, [analyzedImage, reset, setValue])
 
+    // Prefill subCategory
     useEffect(() => {
-        // Prefill subCategory
-        if (categoryWatch)
+        if (categoryWatch) {
+            const subCategories = Object.entries(
+                products.categories[
+                    categoryWatch as keyof typeof products.categories
+                ].subcategories,
+            )
+
             for (const tag of analyzedImage.tags) {
-                const subCategoryFound = subcategoriesList.find(
-                    (subCat) =>
-                        subCat.includes(tag.toUpperCase()) ||
-                        tag.toUpperCase().includes(subCat),
+                const subCategoryFound = subCategories.find(
+                    ([key, value]) =>
+                        key.includes(tag.toUpperCase()) ||
+                        tag.toUpperCase().includes(key) ||
+                        value.toUpperCase().includes(tag.toUpperCase()) ||
+                        tag.toUpperCase().includes(value.toUpperCase()),
                 )
-                console.log('subCategoryFound 🔥', subCategoryFound)
-
-                if (subCategoryFound && !subCategoryWatch) {
-                    console.log('IN THE IF 🔥', subCategoryFound)
-
+                if (subCategoryFound) {
                     setValue(
                         'subCategory',
-                        subCategoryFound.replaceAll(' ', '_'),
+                        subCategoryFound[0].replaceAll(' ', '_'),
                     )
 
                     console.log('subCategoryWatch 🔥', subCategoryWatch)
                     break
                 }
             }
+        }
     }, [analyzedImage, reset, setValue, categoryWatch])
 
     // Separate useEffects to log updates
@@ -184,6 +190,7 @@ const ArticleForm = (): React.JSX.Element => {
     useEffect(() => {
         console.log('subCategoryWatch updated:', subCategoryWatch)
     }, [subCategoryWatch])
+
     /**
      * Handles the form submission.
      * @param {ArticleFormData} data - The form data to be submitted
