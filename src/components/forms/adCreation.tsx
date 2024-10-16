@@ -113,7 +113,15 @@ const ArticleForm = (): React.JSX.Element => {
         },
     })
 
-    const { reset, control, watch, setValue, handleSubmit, register } = form
+    const {
+        reset,
+        control,
+        watch,
+        setValue,
+        handleSubmit,
+        register,
+        setError,
+    } = form
 
     const { fields, update } = useFieldArray({
         control,
@@ -201,6 +209,12 @@ const ArticleForm = (): React.JSX.Element => {
         console.log('🚀 onSubmit')
 
         console.log(data)
+
+        setError('addressInput', {
+            message: 'Adresse invalide',
+        })
+
+        console.log(form.formState.errors)
     }
 
     /**
@@ -585,14 +599,34 @@ const ArticleForm = (): React.JSX.Element => {
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        {StatusSchema.options.map((status) => (
-                                            <SelectItem
-                                                key={status}
-                                                value={status}
-                                            >
-                                                {productStatus[status]}
-                                            </SelectItem>
-                                        ))}
+                                        <SelectItem
+                                            key={StatusSchema.Enum.AVAILABLE}
+                                            value={StatusSchema.Enum.AVAILABLE}
+                                        >
+                                            {
+                                                productStatus[
+                                                    StatusSchema.Enum.AVAILABLE
+                                                ]
+                                            }
+                                        </SelectItem>
+                                        <SelectItem
+                                            key={StatusSchema.Enum.UNAVAILABLE}
+                                            value={
+                                                StatusSchema.Enum.UNAVAILABLE
+                                            }
+                                        >
+                                            {
+                                                productStatus[
+                                                    StatusSchema.Enum
+                                                        .UNAVAILABLE
+                                                ]
+                                            }{' '}
+                                            <span className='text-red-500 opacity-[0.7]'>
+                                                {
+                                                    ' (Sera enregistré mais non publié)'
+                                                }
+                                            </span>
+                                        </SelectItem>
                                     </SelectContent>
                                 </Select>
                             </FormItem>
