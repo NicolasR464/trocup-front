@@ -68,10 +68,14 @@ import {
     ChevronsUpDown,
     CircleX,
     House,
+    HousePlus,
 } from 'lucide-react'
 
 const ArticleForm = (): React.JSX.Element => {
     const [newAddressOpen, setNewAddressOpen] = useState(false)
+    const [isManufactureCalendarOpen, setIsManufactureCalendarOpen] =
+        useState(false)
+    const [isPurchaseDateOpen, setIsPurchaseDateOpen] = useState(false)
 
     const addressInputClass = 'w-full sm:w-[420px]'
 
@@ -410,7 +414,10 @@ const ArticleForm = (): React.JSX.Element => {
                                 <FormLabel className='text-lg font-semibold'>
                                     {'Date de fabrication'}
                                 </FormLabel>
-                                <Popover>
+                                <Popover
+                                    open={isManufactureCalendarOpen}
+                                    onOpenChange={setIsManufactureCalendarOpen}
+                                >
                                     <PopoverTrigger asChild>
                                         <FormControl>
                                             <Button
@@ -433,14 +440,18 @@ const ArticleForm = (): React.JSX.Element => {
                                         </FormControl>
                                     </PopoverTrigger>
                                     <PopoverContent
-                                        className='w-auto p-0'
+                                        className='z-[100] w-auto p-0'
                                         align='start'
                                     >
                                         <Calendar
                                             mode='single'
-                                            className='bg-white'
                                             selected={field.value}
-                                            onSelect={field.onChange}
+                                            onSelect={(date) => {
+                                                field.onChange(date)
+                                                setIsManufactureCalendarOpen(
+                                                    false,
+                                                )
+                                            }}
                                             disabled={(date) =>
                                                 date > new Date() ||
                                                 date < new Date('1900-01-01')
@@ -464,7 +475,10 @@ const ArticleForm = (): React.JSX.Element => {
                                 <FormLabel className='text-lg font-semibold'>
                                     {'Date d’achat'}
                                 </FormLabel>
-                                <Popover>
+                                <Popover
+                                    open={isPurchaseDateOpen}
+                                    onOpenChange={setIsPurchaseDateOpen}
+                                >
                                     <PopoverTrigger asChild>
                                         <FormControl>
                                             <Button
@@ -474,6 +488,9 @@ const ArticleForm = (): React.JSX.Element => {
                                                     !field.value &&
                                                         'text-muted-foreground',
                                                 )}
+                                                onClick={() =>
+                                                    setIsPurchaseDateOpen(true)
+                                                }
                                             >
                                                 {field.value ? (
                                                     format(field.value, 'PPP')
@@ -487,13 +504,16 @@ const ArticleForm = (): React.JSX.Element => {
                                         </FormControl>
                                     </PopoverTrigger>
                                     <PopoverContent
-                                        className='w-auto p-0'
+                                        className='z-50 w-auto p-0'
                                         align='start'
                                     >
                                         <Calendar
                                             mode='single'
                                             selected={field.value}
-                                            onSelect={field.onChange}
+                                            onSelect={(date) => {
+                                                field.onChange(date)
+                                                setIsPurchaseDateOpen(false)
+                                            }}
                                             disabled={(date) =>
                                                 date > new Date() ||
                                                 date < new Date('1900-01-01')
@@ -697,8 +717,6 @@ const ArticleForm = (): React.JSX.Element => {
                         )}
                     />
 
-                    {/** Address */}
-
                     {/** Saved user addresses */}
                     {!!storedAddresses && storedAddresses.length > 0 && (
                         <div className='flex justify-center'>
@@ -732,7 +750,7 @@ const ArticleForm = (): React.JSX.Element => {
                                                     >
                                                         <SelectValue
                                                             placeholder={
-                                                                <House />
+                                                                <House className='opacity-50' />
                                                             }
                                                         />
                                                     </SelectTrigger>
@@ -823,17 +841,15 @@ const ArticleForm = (): React.JSX.Element => {
                                                                 addressObjectWatch,
                                                             ).length === 0 &&
                                                             field.value}
+
                                                         {!!addressObjectWatch &&
-                                                            Object.keys(
-                                                                addressObjectWatch,
-                                                            ).length > 0 &&
-                                                            addressObjectWatch.label}
-                                                        {!field.value &&
-                                                            !!addressObjectWatch &&
-                                                            Object.keys(
-                                                                addressObjectWatch,
-                                                            ).length === 0 &&
-                                                            'Rentre ton adresse'}
+                                                        Object.keys(
+                                                            addressObjectWatch,
+                                                        ).length > 0 ? (
+                                                            addressObjectWatch.label
+                                                        ) : (
+                                                            <HousePlus className='opacity-[0.8]' />
+                                                        )}
 
                                                         {!!addressObjectWatch &&
                                                             Object.keys(
@@ -891,7 +907,7 @@ const ArticleForm = (): React.JSX.Element => {
                                                             'Aucune adresse trouvée'
                                                         ) : (
                                                             <div className='flex justify-center'>
-                                                                <House />
+                                                                <HousePlus />
                                                             </div>
                                                         )}
                                                     </CommandEmpty>

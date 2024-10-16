@@ -109,6 +109,7 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
             <div className='relative inline-flex h-8 w-24 rounded-md border border-input'>
                 <Input
                     min={0}
+                    step='0.1'
                     type='number'
                     value={value?.toString() ?? ''}
                     onChange={handleChange}

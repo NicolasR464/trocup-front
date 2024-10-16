@@ -118,7 +118,7 @@ const ImageProcessing = (): React.JSX.Element => {
                             }}
                         />
                         <span className='relative z-10'>
-                            {'Ajoute une image'}
+                            {'➕ Ajoute une photo'}
                         </span>
                     </Button>
                 )}
