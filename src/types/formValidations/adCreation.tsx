@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { AddressSuggestionSchema } from '@/types/address/gouvApiCall'
-import { AddressSchema } from '@/types/address/userAddress'
+import { Address, AddressSchema } from '@/types/address/userAddress'
 import { ArticleSchema } from '@/types/article'
 
 /**
@@ -34,10 +34,23 @@ export const ArticleFormDataSchema = ArticleSchema.pick({
      */
     addressInput: z.string().optional(),
     /**
-     * @description The full address chosen by the user
+     * @description The full address object chosen by the user
      */
-    addressObject: AddressSchema,
+    newAddressObject: AddressSchema,
+    registeredAddressObject: AddressSchema,
+    /**
+     * @description The list of addresses suggested by the API
+     */
     addressSuggestions: z.array(AddressSuggestionSchema).optional(),
 })
 
 export type ArticleFormData = z.infer<typeof ArticleFormDataSchema>
+
+export const addressObjectEmpty: Address = {
+    label: '',
+    street: '',
+    city: '',
+    postcode: '',
+    citycode: '',
+    geopoints: { type: '', coordinates: [] },
+}

@@ -53,7 +53,10 @@ import {
 import type { AddressSuggestion } from '@/types/address/gouvApiCall'
 import { DeliveryTypeSchema, StateSchema, StatusSchema } from '@/types/article'
 import type { ArticleFormData } from '@/types/formValidations/adCreation'
-import { ArticleFormDataSchema } from '@/types/formValidations/adCreation'
+import {
+    addressObjectEmpty,
+    ArticleFormDataSchema,
+} from '@/types/formValidations/adCreation'
 
 import { useDebouncedCallback } from '@mantine/hooks'
 import { Label } from '@radix-ui/react-label'
@@ -75,7 +78,6 @@ const ArticleForm = (): React.JSX.Element => {
     const [newAddressOpen, setNewAddressOpen] = useState(false)
     const [isManufactureDateOpen, setIsManufactureDateOpen] = useState(false)
     const [isPurchaseDateOpen, setIsPurchaseDateOpen] = useState(false)
-    const [fromRegisteredAddress, setFromRegisteredAddress] = useState(false)
 
     const addressInputClass = 'w-full sm:w-[420px]'
 
@@ -106,7 +108,8 @@ const ArticleForm = (): React.JSX.Element => {
             },
             savedUserAddressLabel: undefined,
             addressInput: '',
-            addressObject: undefined,
+            newAddressObject: addressObjectEmpty,
+            registeredAddressObject: addressObjectEmpty,
         },
     })
 
@@ -121,7 +124,8 @@ const ArticleForm = (): React.JSX.Element => {
     })
 
     // Watch user inputs dynamically
-    const addressObjectWatch = watch('addressObject')
+    const newAddressObjectWatch = watch('newAddressObject')
+    const registeredAddressObjectWatch = watch('registeredAddressObject')
     const addressInputWatch = watch('addressInput')
     const savedUserAddressLabelWatch = watch('savedUserAddressLabel')
     const categoryWatch = watch('category')
@@ -684,7 +688,6 @@ const ArticleForm = (): React.JSX.Element => {
                                 <FormLabel className='text-lg font-semibold'>
                                     {'Taille'}
                                 </FormLabel>
-                                {/* ... RadioGroup code ... */}
                                 <FormControl>
                                     <Select
                                         onValueChange={field.onChange}
@@ -739,18 +742,9 @@ const ArticleForm = (): React.JSX.Element => {
                                                         value,
                                                     )
 
-                                                    setFromRegisteredAddress(
-                                                        true,
-                                                    )
-
                                                     setValue(
-                                                        'addressObject',
-                                                        undefined,
-                                                    )
-
-                                                    setValue(
-                                                        'addressObject',
-                                                        JSON.parse(value),
+                                                        'newAddressObject',
+                                                        addressObjectEmpty,
                                                     )
 
                                                     field.onChange(value)
@@ -806,7 +800,7 @@ const ArticleForm = (): React.JSX.Element => {
                             />
                         </div>
                     )}
-                    {JSON.stringify(fromRegisteredAddress)}
+
                     {/** Article Address */}
                     <div className='mt-[9px] flex justify-center'>
                         <FormField
@@ -842,6 +836,10 @@ const ArticleForm = (): React.JSX.Element => {
                                                                 'text-muted-foreground',
                                                         )}
                                                         onClick={() => {
+                                                            console.log(
+                                                                '🚀 onClick',
+                                                            )
+
                                                             if (
                                                                 !newAddressOpen
                                                             ) {
@@ -849,54 +847,35 @@ const ArticleForm = (): React.JSX.Element => {
                                                                     true,
                                                                 )
                                                             }
-                                                            setFromRegisteredAddress(
-                                                                false,
-                                                            )
                                                         }}
                                                     >
-                                                        {!!addressObjectWatch &&
-                                                            Object.keys(
-                                                                addressObjectWatch,
-                                                            ).length === 0 &&
-                                                            field.value}
+                                                        {/* {field.value} */}
 
-                                                        {!!addressObjectWatch &&
-                                                        Object.keys(
-                                                            addressObjectWatch,
-                                                        ).length > 0 &&
-                                                        !fromRegisteredAddress ? (
-                                                            addressObjectWatch.label
-                                                        ) : (
+                                                        {newAddressObjectWatch.label &&
+                                                            newAddressObjectWatch.label}
+
+                                                        {!newAddressObjectWatch.label && (
                                                             <HousePlus className='opacity-[0.8]' />
                                                         )}
 
-                                                        {!!addressObjectWatch &&
-                                                            Object.keys(
-                                                                addressObjectWatch,
-                                                            ).length > 0 &&
-                                                            !fromRegisteredAddress && (
-                                                                <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                                                            )}
+                                                        {newAddressObjectWatch.label && (
+                                                            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                                                        )}
                                                     </Button>
                                                 </FormControl>
                                             </PopoverTrigger>
-                                            {!!addressObjectWatch &&
-                                                Object.keys(addressObjectWatch)
-                                                    .length > 0 &&
-                                                !fromRegisteredAddress && (
-                                                    <CircleX
-                                                        className='ml-2 h-6 w-6 shrink-0 cursor-pointer text-red-500'
-                                                        onClick={() => {
-                                                            setValue(
-                                                                'addressObject',
-                                                                undefined,
-                                                            )
-                                                            setNewAddressOpen(
-                                                                false,
-                                                            )
-                                                        }}
-                                                    />
-                                                )}
+                                            {newAddressObjectWatch.label && (
+                                                <CircleX
+                                                    className='ml-2 h-6 w-6 shrink-0 cursor-pointer text-red-500'
+                                                    onClick={() => {
+                                                        setValue(
+                                                            'newAddressObject',
+                                                            addressObjectEmpty,
+                                                        )
+                                                        setNewAddressOpen(false)
+                                                    }}
+                                                />
+                                            )}
                                         </div>
 
                                         <PopoverContent className='w-[300px] p-0'>
@@ -951,7 +930,7 @@ const ArticleForm = (): React.JSX.Element => {
                                                                     }
                                                                     onSelect={() => {
                                                                         setValue(
-                                                                            'addressObject',
+                                                                            'newAddressObject',
                                                                             {
                                                                                 ...suggestion.properties,
                                                                                 label: suggestion
