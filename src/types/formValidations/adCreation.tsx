@@ -36,7 +36,7 @@ export const ArticleFormDataSchema = ArticleSchema.pick({
     /**
      * @description The full address chosen by the user
      */
-    addressObject: AddressSchema.optional(),
+    addressObject: AddressSchema,
     addressSuggestions: z.array(AddressSuggestionSchema).optional(),
 })
 

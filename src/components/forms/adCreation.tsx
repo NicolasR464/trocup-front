@@ -73,9 +73,9 @@ import {
 
 const ArticleForm = (): React.JSX.Element => {
     const [newAddressOpen, setNewAddressOpen] = useState(false)
-    const [isManufactureCalendarOpen, setIsManufactureCalendarOpen] =
-        useState(false)
+    const [isManufactureDateOpen, setIsManufactureDateOpen] = useState(false)
     const [isPurchaseDateOpen, setIsPurchaseDateOpen] = useState(false)
+    const [fromRegisteredAddress, setFromRegisteredAddress] = useState(false)
 
     const addressInputClass = 'w-full sm:w-[420px]'
 
@@ -93,7 +93,7 @@ const ArticleForm = (): React.JSX.Element => {
             manufactureDate: undefined,
             purchaseDate: undefined,
             state: undefined,
-            status: 'AVAILABLE',
+            status: StatusSchema.Enum.AVAILABLE,
             category: undefined,
             subCategory: undefined,
             size: undefined,
@@ -194,6 +194,9 @@ const ArticleForm = (): React.JSX.Element => {
      */
     const onSubmit = (data: ArticleFormData) => {
         /** @TODO : send the data to the API */
+        console.log('🚀 onSubmit')
+
+        console.log(data)
     }
 
     /**
@@ -205,7 +208,7 @@ const ArticleForm = (): React.JSX.Element => {
      * @returns {void}
      */
     const onError = (errors: FieldErrors<ArticleFormData>): void => {
-        console.error('Validation Errors:', errors)
+        console.log('Validation Errors:', errors)
     }
 
     /**
@@ -415,8 +418,8 @@ const ArticleForm = (): React.JSX.Element => {
                                     {'Date de fabrication'}
                                 </FormLabel>
                                 <Popover
-                                    open={isManufactureCalendarOpen}
-                                    onOpenChange={setIsManufactureCalendarOpen}
+                                    open={isManufactureDateOpen}
+                                    onOpenChange={setIsManufactureDateOpen}
                                 >
                                     <PopoverTrigger asChild>
                                         <FormControl>
@@ -448,9 +451,7 @@ const ArticleForm = (): React.JSX.Element => {
                                             selected={field.value}
                                             onSelect={(date) => {
                                                 field.onChange(date)
-                                                setIsManufactureCalendarOpen(
-                                                    false,
-                                                )
+                                                setIsManufactureDateOpen(false)
                                             }}
                                             disabled={(date) =>
                                                 date > new Date() ||
@@ -733,10 +734,25 @@ const ArticleForm = (): React.JSX.Element => {
                                         <div className='flex items-center'>
                                             <Select
                                                 onValueChange={(value) => {
+                                                    console.log(
+                                                        '🚀 onValueChange',
+                                                        value,
+                                                    )
+
+                                                    setFromRegisteredAddress(
+                                                        true,
+                                                    )
+
                                                     setValue(
                                                         'addressObject',
                                                         undefined,
                                                     )
+
+                                                    setValue(
+                                                        'addressObject',
+                                                        JSON.parse(value),
+                                                    )
+
                                                     field.onChange(value)
                                                 }}
                                                 value={field.value ?? ''}
@@ -762,9 +778,9 @@ const ArticleForm = (): React.JSX.Element => {
                                                                 key={
                                                                     address.label
                                                                 }
-                                                                value={
-                                                                    address.label
-                                                                }
+                                                                value={JSON.stringify(
+                                                                    address,
+                                                                )}
                                                             >
                                                                 {address.label}
                                                             </SelectItem>
@@ -790,7 +806,7 @@ const ArticleForm = (): React.JSX.Element => {
                             />
                         </div>
                     )}
-
+                    {JSON.stringify(fromRegisteredAddress)}
                     {/** Article Address */}
                     <div className='mt-[9px] flex justify-center'>
                         <FormField
@@ -833,10 +849,12 @@ const ArticleForm = (): React.JSX.Element => {
                                                                     true,
                                                                 )
                                                             }
+                                                            setFromRegisteredAddress(
+                                                                false,
+                                                            )
                                                         }}
                                                     >
-                                                        {!!field.value &&
-                                                            !!addressObjectWatch &&
+                                                        {!!addressObjectWatch &&
                                                             Object.keys(
                                                                 addressObjectWatch,
                                                             ).length === 0 &&
@@ -845,7 +863,8 @@ const ArticleForm = (): React.JSX.Element => {
                                                         {!!addressObjectWatch &&
                                                         Object.keys(
                                                             addressObjectWatch,
-                                                        ).length > 0 ? (
+                                                        ).length > 0 &&
+                                                        !fromRegisteredAddress ? (
                                                             addressObjectWatch.label
                                                         ) : (
                                                             <HousePlus className='opacity-[0.8]' />
@@ -854,7 +873,8 @@ const ArticleForm = (): React.JSX.Element => {
                                                         {!!addressObjectWatch &&
                                                             Object.keys(
                                                                 addressObjectWatch,
-                                                            ).length > 0 && (
+                                                            ).length > 0 &&
+                                                            !fromRegisteredAddress && (
                                                                 <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                                                             )}
                                                     </Button>
@@ -862,7 +882,8 @@ const ArticleForm = (): React.JSX.Element => {
                                             </PopoverTrigger>
                                             {!!addressObjectWatch &&
                                                 Object.keys(addressObjectWatch)
-                                                    .length > 0 && (
+                                                    .length > 0 &&
+                                                !fromRegisteredAddress && (
                                                     <CircleX
                                                         className='ml-2 h-6 w-6 shrink-0 cursor-pointer text-red-500'
                                                         onClick={() => {
@@ -991,8 +1012,8 @@ const ArticleForm = (): React.JSX.Element => {
                                             <FormControl>
                                                 <RadioGroupItem
                                                     value={
-                                                        DeliveryTypeSchema
-                                                            .options[0]
+                                                        DeliveryTypeSchema.Enum
+                                                            .SHIPPING
                                                     }
                                                 />
                                             </FormControl>
@@ -1004,8 +1025,8 @@ const ArticleForm = (): React.JSX.Element => {
                                             <FormControl>
                                                 <RadioGroupItem
                                                     value={
-                                                        DeliveryTypeSchema
-                                                            .options[1]
+                                                        DeliveryTypeSchema.Enum
+                                                            .PICKUP
                                                     }
                                                 />
                                             </FormControl>
@@ -1017,8 +1038,8 @@ const ArticleForm = (): React.JSX.Element => {
                                             <FormControl>
                                                 <RadioGroupItem
                                                     value={
-                                                        DeliveryTypeSchema
-                                                            .options[2]
+                                                        DeliveryTypeSchema.Enum
+                                                            .BOTH
                                                     }
                                                 />
                                             </FormControl>
