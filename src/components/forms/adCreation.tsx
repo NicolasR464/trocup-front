@@ -72,6 +72,7 @@ import {
     House,
     HousePlus,
 } from 'lucide-react'
+import { Tooltip, TooltipProvider, TooltipTrigger } from '../shadcn/ui/tooltip'
 
 const ArticleForm = (): React.JSX.Element => {
     const [newAddressOpen, setNewAddressOpen] = useState(false)
@@ -81,7 +82,9 @@ const ArticleForm = (): React.JSX.Element => {
     const addressInputClass = 'w-full sm:w-[420px]'
 
     // Data stored in Zustand stores
-    const { address: storedAddresses } = useUserStore((state) => state.user)
+    const { address: storedAddresses, isPremium } = useUserStore(
+        (state) => state.user,
+    )
     const analyzedImage = useArticleStore((state) => state.analysedImage)
 
     const form = useForm<ArticleFormData>({
@@ -98,7 +101,7 @@ const ArticleForm = (): React.JSX.Element => {
             category: undefined,
             subCategory: undefined,
             size: undefined,
-            deliveryType: undefined,
+            deliveryType: DeliveryTypeSchema.Enum.PICKUP,
             dimensions: {
                 length: 0,
                 width: 0,
@@ -269,14 +272,14 @@ const ArticleForm = (): React.JSX.Element => {
             >
                 <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
                     {/* Ad Title Input */}
-                    <Controller
+                    <FormField
                         control={control}
                         name='adTitle'
                         render={({ field }) => (
                             <FormItem className='col-span-full'>
-                                <Label className='text-lg font-semibold'>
+                                <FormLabel className='text-lg font-semibold'>
                                     {'Titre de l’annonce'}
-                                </Label>
+                                </FormLabel>
                                 <FormMessage />
                                 <FormControl>
                                     <Input
@@ -1022,72 +1025,79 @@ const ArticleForm = (): React.JSX.Element => {
                     </div>
 
                     {/* Delivery Type Checkboxes */}
-                    <FormField
-                        control={control}
-                        name='deliveryType'
-                        render={({ field }) => (
-                            <FormItem className='space-y-3'>
-                                <FormLabel className='text-lg font-semibold'>
-                                    {'Type de livraison'}
-                                </FormLabel>
-                                <FormMessage />
-                                <FormControl>
-                                    <RadioGroup
-                                        onValueChange={field.onChange}
-                                        defaultValue={field.value}
-                                        className='flex flex-col space-y-1'
-                                    >
-                                        <FormItem className='flex items-center space-x-3 space-y-0'>
-                                            <FormControl>
-                                                <RadioGroupItem
-                                                    value={
-                                                        DeliveryTypeSchema.Enum
-                                                            .SHIPPING
-                                                    }
-                                                />
-                                            </FormControl>
-                                            <FormLabel className='font-normal'>
-                                                {deliveryTypes.SHIPPING}
-                                            </FormLabel>
-                                        </FormItem>
-                                        <FormItem className='flex items-center space-x-3 space-y-0'>
-                                            <FormControl>
-                                                <RadioGroupItem
-                                                    value={
-                                                        DeliveryTypeSchema.Enum
-                                                            .PICKUP
-                                                    }
-                                                />
-                                            </FormControl>
-                                            <FormLabel className='font-normal'>
-                                                {deliveryTypes.PICKUP}
-                                            </FormLabel>
-                                        </FormItem>
-                                        <FormItem className='flex items-center space-x-3 space-y-0'>
-                                            <FormControl>
-                                                <RadioGroupItem
-                                                    value={
-                                                        DeliveryTypeSchema.Enum
-                                                            .BOTH
-                                                    }
-                                                />
-                                            </FormControl>
-                                            <FormLabel className='font-normal'>
-                                                {deliveryTypes.BOTH}
-                                            </FormLabel>
-                                        </FormItem>
-                                    </RadioGroup>
-                                </FormControl>
-                            </FormItem>
-                        )}
-                    />
+
+                    {isPremium && (
+                        <FormField
+                            control={control}
+                            name='deliveryType'
+                            render={({ field }) => (
+                                <FormItem className='space-y-3'>
+                                    <FormLabel className='text-lg font-semibold'>
+                                        {'Type de livraison'}
+                                    </FormLabel>
+                                    <FormMessage />
+                                    <FormControl>
+                                        <RadioGroup
+                                            onValueChange={field.onChange}
+                                            defaultValue={field.value}
+                                            className='flex flex-col space-y-1'
+                                        >
+                                            <FormItem className='flex items-center space-x-3 space-y-0'>
+                                                <FormControl>
+                                                    <RadioGroupItem
+                                                        value={
+                                                            DeliveryTypeSchema
+                                                                .Enum.SHIPPING
+                                                        }
+                                                    />
+                                                </FormControl>
+                                                <FormLabel className='font-normal'>
+                                                    {deliveryTypes.SHIPPING}
+                                                </FormLabel>
+                                            </FormItem>
+
+                                            <FormItem className='flex items-center space-x-3 space-y-0'>
+                                                <FormControl>
+                                                    <RadioGroupItem
+                                                        value={
+                                                            DeliveryTypeSchema
+                                                                .Enum.PICKUP
+                                                        }
+                                                    />
+                                                </FormControl>
+                                                <FormLabel className='font-normal'>
+                                                    {deliveryTypes.PICKUP}
+                                                </FormLabel>
+                                            </FormItem>
+                                            <FormItem className='flex items-center space-x-3 space-y-0'>
+                                                <FormControl>
+                                                    <RadioGroupItem
+                                                        disabled={!isPremium}
+                                                        value={
+                                                            DeliveryTypeSchema
+                                                                .Enum.BOTH
+                                                        }
+                                                    />
+                                                </FormControl>
+                                                <FormLabel className='font-normal'>
+                                                    {deliveryTypes.BOTH}
+                                                </FormLabel>
+                                            </FormItem>
+                                        </RadioGroup>
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+                    )}
                 </div>
-                <Button
-                    type='submit'
-                    className='w-full md:w-auto'
-                >
-                    {'✨ Estimer l’article'}
-                </Button>
+                <div className='flex justify-center'>
+                    <Button
+                        type='submit'
+                        className='w-full md:w-auto'
+                    >
+                        {'✨ Estimer la valeur de l’article'}
+                    </Button>
+                </div>
             </form>
         </Form>
     )
