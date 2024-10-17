@@ -58,7 +58,6 @@ import {
 } from '@/types/formValidations/adCreation'
 
 import { useDebouncedCallback } from '@mantine/hooks'
-import { Label } from '@radix-ui/react-label'
 import {
     Popover,
     PopoverContent,
@@ -72,7 +71,6 @@ import {
     House,
     HousePlus,
 } from 'lucide-react'
-import { Tooltip, TooltipProvider, TooltipTrigger } from '../shadcn/ui/tooltip'
 
 const ArticleForm = (): React.JSX.Element => {
     const [newAddressOpen, setNewAddressOpen] = useState(false)
@@ -152,7 +150,7 @@ const ArticleForm = (): React.JSX.Element => {
             analyzedImage.brand.charAt(0).toUpperCase() +
                 analyzedImage.brand.slice(1),
         )
-    }, [analyzedImage])
+    }, [analyzedImage, setValue])
 
     // Set prefilled category from the analyzed image
     useEffect(() => {
@@ -211,11 +209,20 @@ const ArticleForm = (): React.JSX.Element => {
 
         console.log(data)
 
-        setError('addressInput', {
-            message: 'Adresse invalide',
-        })
+        if (
+            !data.newAddressObject.label &&
+            !data.registeredAddressObject.label
+        ) {
+            console.log('🚀 error address')
+            setError('savedUserAddressLabel', {
+                message: 'Tu dois choisir une adresse',
+            })
+            setError('addressInput', {
+                message: 'Tu dois choisir une adresse',
+            })
+        }
 
-        console.log(form.formState.errors)
+        // console.log(form.formState.errors)
     }
 
     /**
@@ -887,17 +894,10 @@ const ArticleForm = (): React.JSX.Element => {
                                                                 'text-muted-foreground',
                                                         )}
                                                         onClick={() => {
-                                                            console.log(
-                                                                '🚀 onClick',
-                                                            )
-
-                                                            if (
-                                                                !newAddressOpen
-                                                            ) {
+                                                            if (!newAddressOpen)
                                                                 setNewAddressOpen(
                                                                     true,
                                                                 )
-                                                            }
                                                         }}
                                                     >
                                                         {!newAddressObjectWatch.label && (
@@ -1026,7 +1026,7 @@ const ArticleForm = (): React.JSX.Element => {
 
                     {/* Delivery Type Checkboxes */}
 
-                    {isPremium && (
+                    {!!isPremium && (
                         <FormField
                             control={control}
                             name='deliveryType'

@@ -177,14 +177,12 @@ export const RegistrationForm = (): React.JSX.Element => {
                     if (
                         (errorMsg as AxiosError<{ error: string }>).response
                             ?.data.error === 'pseudo already in use'
-                    )
+                    ) {
                         setErrorPseudo('Ce pseudo est déjà pris.')
+                        return
+                    }
 
-                    if (
-                        (errorMsg as AxiosError<{ error: string }>).response
-                            ?.data.error === 'email already in use'
-                    )
-                        router.push(`${pagePaths.HOME}?onboardingSuccess=false`)
+                    router.push(`${pagePaths.HOME}?onboardingSuccess=false`)
                 },
             },
         )

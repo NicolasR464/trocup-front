@@ -50,8 +50,8 @@ export const ArticleFormDataSchema = ArticleSchema.pick({
     /**
      * @description The full address object chosen by the user
      */
-    newAddressObject: AddressSchema,
-    registeredAddressObject: AddressSchema,
+    newAddressObject: AddressSchema.partial(),
+    registeredAddressObject: AddressSchema.partial(),
     /**
      * @description The list of addresses suggested by the API
      */
