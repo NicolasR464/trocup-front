@@ -39,6 +39,7 @@ import { cn } from '@/components/shadcn/utils'
 
 import { useArticleStore } from '@/stores/article'
 import { useUserStore } from '@/stores/user'
+import { useProductDataAnalysis } from '@/utils/apiCalls/local/mutations'
 import { getAddressSuggestions } from '@/utils/apiCalls/thirdPartyApis/addressSuggestions'
 import {
     categoriesList,
@@ -50,7 +51,12 @@ import {
 } from '@/utils/constants/productValues'
 
 import type { AddressSuggestion } from '@/types/address/gouvApiCall'
-import { DeliveryTypeSchema, StateSchema, StatusSchema } from '@/types/article'
+import {
+    Article,
+    DeliveryTypeSchema,
+    StateSchema,
+    StatusSchema,
+} from '@/types/article'
 import type { ArticleFormData } from '@/types/formValidations/adCreation'
 import {
     addressObjectEmpty,
@@ -76,6 +82,9 @@ const ArticleForm = (): React.JSX.Element => {
     const [newAddressOpen, setNewAddressOpen] = useState(false)
     const [isManufactureDateOpen, setIsManufactureDateOpen] = useState(false)
     const [isPurchaseDateOpen, setIsPurchaseDateOpen] = useState(false)
+    const [analyzedProduct, setAnalyzedProduct] = useState()
+
+    const { mutateAsync, isPending } = useProductDataAnalysis()
 
     const addressInputClass = 'w-full sm:w-[420px]'
 
@@ -203,17 +212,11 @@ const ArticleForm = (): React.JSX.Element => {
      * @param {ArticleFormData} data - The form data to be submitted
      * @returns {void}
      */
-    const onSubmit = (data: ArticleFormData): void => {
-        /** @TODO : send the data to the API */
-        console.log('🚀 onSubmit')
-
-        console.log(data)
-
+    const onSubmit = async (data: ArticleFormData): Promise<void> => {
         if (
             !data.newAddressObject.label &&
             !data.registeredAddressObject.label
         ) {
-            console.log('🚀 error address')
             setError('savedUserAddressLabel', {
                 message: 'Tu dois choisir une adresse',
             })
@@ -222,7 +225,32 @@ const ArticleForm = (): React.JSX.Element => {
             })
         }
 
-        // console.log(form.formState.errors)
+        const articleData: Partial<Article> = {
+            adTitle: data.adTitle,
+            brand: data.brand,
+            model: data.model,
+            description: data.description,
+            manufactureDate: data.manufactureDate,
+            purchaseDate: data.purchaseDate,
+            state: StateSchema.Enum[
+                data.state as keyof typeof StateSchema.Enum
+            ],
+            category: data.category,
+            subCategory: data.subCategory,
+            size: data.size,
+            dimensions: data.dimensions,
+        }
+        /** @TODO : send the data to the API */
+        await mutateAsync(
+            { formData: articleData },
+            {
+                onSuccess: (result) => {
+                    if (result) {
+                        setAnalyzedProduct(result)
+                    }
+                },
+            },
+        )
     }
 
     /**
@@ -234,11 +262,8 @@ const ArticleForm = (): React.JSX.Element => {
      * @returns {void}
      */
     const onError = (errors: FieldErrors<ArticleFormData>): void => {
-        console.log('Validation Errors:', errors)
-
-        setError('addressInput', {
-            message: 'Adresse invalide',
-        })
+        console.error('onError')
+        console.log(errors)
     }
 
     /**
@@ -524,9 +549,9 @@ const ArticleForm = (): React.JSX.Element => {
                                                     !field.value &&
                                                         'text-muted-foreground',
                                                 )}
-                                                onClick={() =>
+                                                onClick={() => {
                                                     setIsPurchaseDateOpen(true)
-                                                }
+                                                }}
                                             >
                                                 {field.value ? (
                                                     format(field.value, 'PPP')
@@ -904,7 +929,7 @@ const ArticleForm = (): React.JSX.Element => {
                                                             <HousePlus className='opacity-[0.8]' />
                                                         )}
 
-                                                        {newAddressObjectWatch.label && (
+                                                        {!!newAddressObjectWatch.label && (
                                                             <>
                                                                 {
                                                                     newAddressObjectWatch.label
@@ -915,7 +940,7 @@ const ArticleForm = (): React.JSX.Element => {
                                                     </Button>
                                                 </FormControl>
                                             </PopoverTrigger>
-                                            {newAddressObjectWatch.label && (
+                                            {!!newAddressObjectWatch.label && (
                                                 <CircleX
                                                     className='ml-2 h-6 w-6 shrink-0 cursor-pointer text-red-500'
                                                     onClick={() => {

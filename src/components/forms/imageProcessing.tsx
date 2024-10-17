@@ -11,7 +11,6 @@ import type { ImageAnalysisSuccess } from '@/utils/apiCalls/local'
 import { useImageAnalysis } from '@/utils/apiCalls/local/mutations'
 
 import { Button } from '../shadcn/ui/button'
-import { log } from 'console'
 
 const getImageBlob = async (data: FileDropItem): Promise<File> => {
     const file = await data.getFile()
@@ -19,7 +18,6 @@ const getImageBlob = async (data: FileDropItem): Promise<File> => {
 }
 
 const ImageProcessing = (): React.JSX.Element => {
-    const [dropped, setDropped] = useState(false)
     const [image, setImage] = useState<string>('')
     const [isDragging, setIsDragging] = useState(false)
     const [objectData, setObjectData] = useState<
@@ -45,20 +43,12 @@ const ImageProcessing = (): React.JSX.Element => {
             { file },
             {
                 onSuccess: (data) => {
-                    console.log('✅ mutate success')
-                    console.log('🔥', data)
-
                     if ('content' in data) {
-                        console.log(' in if condition 🔥', data)
-
                         setObjectData(data)
 
                         // Store data in the store
                         setAnalyzedImage(data.content)
                     }
-                },
-                onError: (error) => {
-                    console.error('An error occurred:', error)
                 },
             },
         )
@@ -87,15 +77,12 @@ const ImageProcessing = (): React.JSX.Element => {
                     setIsDragging(false)
                 }}
                 onDrop={(event) => {
-                    getImageBlob(event.items[0] as FileDropItem)
-                        .then((imageResult) => {
+                    getImageBlob(event.items[0] as FileDropItem).then(
+                        (imageResult) => {
                             handleFileChange(imageResult)
                             setIsDragging(false)
-                            setDropped(true)
-                        })
-                        .catch((error: unknown) => {
-                            console.error(error)
-                        })
+                        },
+                    )
                 }}
             >
                 {/** Image selection window */}

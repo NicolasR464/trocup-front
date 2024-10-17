@@ -1,6 +1,8 @@
-import type { ImageAnalysisResponse } from './index'
+import type { AnalysisResponse } from './index'
 
-import { analyzeImage } from '.'
+import type { Article } from '@/types/article'
+
+import { analyzeImage, analyzeProductData } from '.'
 import type { UseMutationResult } from '@tanstack/react-query'
 import { useMutation } from '@tanstack/react-query'
 
@@ -8,21 +10,34 @@ type UploadImageParams = {
     file: File
 }
 
+type ProductDataParams = {
+    formData: Partial<Article>
+}
+
 /**
- * Custom hook for creating a user using React Query's useMutation.
- *
- * This hook encapsulates the logic for creating a user, leveraging React Query's
- * powerful state management and caching capabilities. It returns a mutation
- * result object that includes functions to trigger the mutation and access
- * its state (loading, error, data).
- * @returns {UseMutationResult} A mutation result object for uploading an image and analyzing it with Azure Cognitive Services, which includes methods like mutate, mutateAsync, and properties like isLoading, isError, and data.
+ * Custom hook for storing and analyzing the content of an image using React Query's useMutation.
+ * @returns {UseMutationResult} A mutation result object for storing and analyzing an image with Cloudinary and Azure Cognitive Services.
  */
 export const useImageAnalysis = (): UseMutationResult<
-    ImageAnalysisResponse,
+    AnalysisResponse,
     Error,
     UploadImageParams
 > => {
-    return useMutation<ImageAnalysisResponse, Error, UploadImageParams>({
+    return useMutation<AnalysisResponse, Error, UploadImageParams>({
         mutationFn: ({ file }) => analyzeImage(file),
+    })
+}
+
+/**
+ * Custom hook for storing and analyzing the content of an image using React Query's useMutation.
+ * @returns {UseMutationResult} A mutation result object for storing and analyzing an image with Cloudinary and Azure Cognitive Services.
+ */
+export const useProductDataAnalysis = (): UseMutationResult<
+    AnalysisResponse,
+    Error,
+    ProductDataParams
+> => {
+    return useMutation<AnalysisResponse, Error, ProductDataParams>({
+        mutationFn: ({ formData }) => analyzeProductData(formData),
     })
 }

@@ -10,6 +10,7 @@ export const apiEndpoints = {
 
     // Local API endpoints
     IMAGE_ANALYSIS: 'image-analysis/',
+    PRODUCT_ANALYSIS: 'product-analysis/',
 
     // Third party APIs
     API_GOUV: 'https://api-adresse.data.gouv.fr/search/',
