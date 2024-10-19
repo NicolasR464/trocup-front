@@ -342,11 +342,6 @@ export const subcategoriesList = Object.values(products.categories).flatMap(
         ),
 )
 
-/** List of product subCategory keys */
-export const subCategoriesList = Object.keys(
-    products.categories,
-) as (keyof typeof products.categories)[]
-
 /** Object containing translations for product states */
 export const productStates = {
     NEW: 'Neuf',
