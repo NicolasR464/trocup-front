@@ -7,6 +7,9 @@ export type ImageAnalysis = {
     brand: string
     tags: string[]
     objectIdentified: string
+    category: string
+    subCategory: string
+    state: string
 }
 
 export type ProductAnalysis = {

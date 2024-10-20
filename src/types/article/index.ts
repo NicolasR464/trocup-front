@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
-import { CategoryEnumSchema, SubcategoryEnumSchema } from './categories'
+import type { CategoryEnumSchema, SubcategoryEnumSchema } from './categories'
+
 import {
     categoriesList,
     subcategoriesList,

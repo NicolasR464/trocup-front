@@ -128,7 +128,7 @@ const ImageProcessing = (): React.JSX.Element => {
 
             {!!isPending && <p>{'Analyse en cours…'}</p>}
 
-            {!!objectData && !isPending && (
+            {/* {!!objectData && !isPending && (
                 <div>
                     {!!objectData.content.objectIdentified && (
                         <p>{`Objet: ${objectData.content.objectIdentified}`}</p>
@@ -140,7 +140,7 @@ const ImageProcessing = (): React.JSX.Element => {
                         <p>{`Catégories: ${objectData.content.tags.join(', ')}`}</p>
                     )}
                 </div>
-            )}
+            )} */}
         </div>
     )
 }

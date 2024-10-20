@@ -22,6 +22,9 @@ export const useArticleStore = create<ArticleStore>()(
             brand: '',
             tags: [],
             objectIdentified: '',
+            category: '',
+            subCategory: '',
+            state: '',
         },
         article: {},
 

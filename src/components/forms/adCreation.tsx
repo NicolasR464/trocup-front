@@ -51,12 +51,8 @@ import {
 } from '@/utils/constants/productValues'
 
 import type { AddressSuggestion } from '@/types/address/gouvApiCall'
-import {
-    Article,
-    DeliveryTypeSchema,
-    StateSchema,
-    StatusSchema,
-} from '@/types/article'
+import type { Article } from '@/types/article'
+import { DeliveryTypeSchema, StateSchema, StatusSchema } from '@/types/article'
 import type { ArticleFormData } from '@/types/formValidations/adCreation'
 import {
     addressObjectEmpty,
@@ -84,9 +80,9 @@ const ArticleForm = (): React.JSX.Element => {
     const [isPurchaseDateOpen, setIsPurchaseDateOpen] = useState(false)
     const [analyzedProduct, setAnalyzedProduct] = useState()
 
-    const { mutateAsync, isPending } = useProductDataAnalysis()
-
     const addressInputClass = 'w-full sm:w-[420px]'
+
+    const { mutateAsync, isPending } = useProductDataAnalysis()
 
     // Data stored in Zustand stores
     const { address: storedAddresses, isPremium } = useUserStore(
@@ -146,66 +142,25 @@ const ArticleForm = (): React.JSX.Element => {
     const newAddressObjectWatch = watch('newAddressObject')
     const categoryWatch = watch('category')
     const subCategoryWatch = watch('subCategory')
-
+    const stateWatch = watch('state')
     // Reset on image change
     useEffect(() => {
         reset()
     }, [reset, analyzedImage])
 
-    // Prefill brand
+    // Prefill form values from the analyzed image
     useEffect(() => {
-        setValue(
-            'brand',
-            analyzedImage.brand.charAt(0).toUpperCase() +
-                analyzedImage.brand.slice(1),
-        )
+        if (analyzedImage.brand) setValue('brand', analyzedImage.brand)
+
+        if (analyzedImage.category) setValue('category', analyzedImage.category)
+
+        if (analyzedImage.state) setValue('state', analyzedImage.state)
     }, [analyzedImage, setValue])
 
-    // Set prefilled category from the analyzed image
     useEffect(() => {
-        // Prefill category
-        for (const tag of analyzedImage.tags) {
-            const categoryFound = categoriesList.find(
-                (cat) =>
-                    cat.includes(tag.toUpperCase()) ||
-                    tag.toUpperCase().includes(cat),
-            )
-            if (categoryFound) {
-                setValue('category', categoryFound)
-
-                break
-            }
-        }
-    }, [analyzedImage, reset, setValue])
-
-    // Prefill subCategory
-    useEffect(() => {
-        if (categoryWatch) {
-            const subCategories = Object.entries(
-                products.categories[
-                    categoryWatch as keyof typeof products.categories
-                ].subcategories,
-            )
-
-            for (const tag of analyzedImage.tags) {
-                const subCategoryFound = subCategories.find(
-                    ([key, value]) =>
-                        key.includes(tag.toUpperCase()) ||
-                        tag.toUpperCase().includes(key) ||
-                        value.toUpperCase().includes(tag.toUpperCase()) ||
-                        tag.toUpperCase().includes(value.toUpperCase()),
-                )
-                if (subCategoryFound) {
-                    setValue(
-                        'subCategory',
-                        subCategoryFound[0].replaceAll(' ', '_'),
-                    )
-
-                    break
-                }
-            }
-        }
-    }, [analyzedImage, reset, setValue, categoryWatch])
+        if (analyzedImage.subCategory && categoryWatch)
+            setValue('subCategory', analyzedImage.subCategory)
+    }, [analyzedImage, categoryWatch, setValue])
 
     /**
      * Handles the form submission.
@@ -405,6 +360,7 @@ const ArticleForm = (): React.JSX.Element => {
                     />
 
                     {/* Subcategory Select */}
+                    {JSON.stringify(subCategoryWatch)}
                     <FormField
                         control={control}
                         name='subCategory'
@@ -602,6 +558,8 @@ const ArticleForm = (): React.JSX.Element => {
                                 <Select
                                     onValueChange={field.onChange}
                                     defaultValue={field.value}
+                                    value={stateWatch ?? field.value}
+                                    defaultValue={stateWatch}
                                 >
                                     <FormControl>
                                         <SelectTrigger>

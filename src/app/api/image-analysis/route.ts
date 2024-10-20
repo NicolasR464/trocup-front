@@ -9,7 +9,13 @@ import { NextResponse } from 'next/server'
 import type { ImageAnalysisSuccess } from '@/utils/apiCalls/local'
 import { apiEndpoints } from '@/utils/constants/endpoints'
 import { mainFolder, subfolders } from '@/utils/constants/images'
+import {
+    categoriesList,
+    products,
+    subcategoriesList,
+} from '@/utils/constants/productValues'
 
+import { StateSchema } from '@/types/article'
 import type { CloudinaryResponse } from '@/types/article/cloudinaryApiCall'
 import { environment } from '@/types/environment'
 
@@ -44,9 +50,20 @@ const analyzeImageFromUrl = async (
         throw result.body.error
     }
 
+    console.log('🚀 ~ result:')
+    console.log(result.body)
+
     let brand = ''
     let objectIdentified = ''
-    let tags: string[] = []
+    const tags: string[] = []
+    let category = ''
+    let subCategory = ''
+    let state = ''
+
+    if (result.body.captionResult?.text.includes('broken')) {
+        state = StateSchema.Enum.TO_REPAIR
+    }
+
     console.log(`Model Version: ${result.body.modelVersion}`)
 
     console.log(`Image Metadata: ${JSON.stringify(result.body.metadata)}`)
@@ -77,6 +94,7 @@ const analyzeImageFromUrl = async (
     // Read the text from the image - and extract the brand name
     if (result.body.readResult && result.body.readResult.blocks.length > 0) {
         brand = result.body.readResult.blocks[0].lines[0].text
+        brand = brand.charAt(0).toUpperCase() + brand.slice(1)
     }
 
     if (result.body.tagsResult) {
@@ -91,10 +109,47 @@ const analyzeImageFromUrl = async (
         }
     }
 
+    // Identify the category and subCategory
+    for (const tag of tags) {
+        // Find the category
+        const categoryFound = categoriesList.find(
+            (cat) =>
+                cat.includes(tag.toUpperCase()) ||
+                tag.toUpperCase().includes(cat),
+        )
+
+        if (categoryFound) {
+            category = categoryFound
+        }
+    }
+
+    // Identify the subCategory
+    if (category) {
+        for (const tag of tags) {
+            const subCategories = Object.entries(
+                products.categories[category].subcategories,
+            )
+
+            const subCategoryFound = subCategories.find(
+                ([key, value]) =>
+                    key.includes(tag.toUpperCase()) ||
+                    tag.toUpperCase().includes(key) ||
+                    value.toUpperCase().includes(tag.toUpperCase()) ||
+                    tag.toUpperCase().includes(value.toUpperCase()),
+            )
+
+            if (subCategoryFound)
+                subCategory = subCategoryFound[0].replaceAll(' ', '_')
+        }
+    }
+
     const objectData = {
         brand,
         objectIdentified,
         tags,
+        category,
+        subCategory,
+        state,
     }
 
     return {
@@ -158,7 +213,13 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
         azureCredential,
     )
 
-    const azureFeatures: string[] = ['Objects', 'Read', 'Tags']
+    const azureFeatures: string[] = [
+        'Objects',
+        'Read',
+        'Tags',
+        'Caption',
+        'DenseCaptions',
+    ]
 
     const azureAnalysis = await analyzeImageFromUrl(
         azureClient,
