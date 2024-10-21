@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -9,11 +8,7 @@ import { NextResponse } from 'next/server'
 import type { ImageAnalysisSuccess } from '@/utils/apiCalls/local'
 import { apiEndpoints } from '@/utils/constants/endpoints'
 import { mainFolder, subfolders } from '@/utils/constants/images'
-import {
-    categoriesList,
-    products,
-    subcategoriesList,
-} from '@/utils/constants/productValues'
+import { categoriesList, products } from '@/utils/constants/productValues'
 
 import { StateSchema } from '@/types/article'
 import type { CloudinaryResponse } from '@/types/article/cloudinaryApiCall'
@@ -50,11 +45,8 @@ const analyzeImageFromUrl = async (
         throw result.body.error
     }
 
-    console.log('🚀 ~ result:')
-    console.log(result.body)
-
     let brand = ''
-    let objectIdentified = ''
+    let objectIdentified: string | undefined = ''
     const tags: string[] = []
     let category = ''
     let subCategory = ''
@@ -64,10 +56,6 @@ const analyzeImageFromUrl = async (
         state = StateSchema.Enum.TO_REPAIR
     }
 
-    console.log(`Model Version: ${result.body.modelVersion}`)
-
-    console.log(`Image Metadata: ${JSON.stringify(result.body.metadata)}`)
-
     // Identify the object name
     if (
         result.body.objectsResult &&
@@ -75,9 +63,6 @@ const analyzeImageFromUrl = async (
     ) {
         const objects = result.body.objectsResult.values
         let highestConfidenceObject = undefined
-
-        console.log('🚀 ~ objects:')
-        console.log(objects)
 
         for (const object of objects) {
             highestConfidenceObject =
@@ -88,7 +73,7 @@ const analyzeImageFromUrl = async (
                     : object
         }
 
-        objectIdentified = highestConfidenceObject.tags[0].name
+        objectIdentified = highestConfidenceObject?.tags[0].name
     }
 
     // Read the text from the image - and extract the brand name
@@ -98,8 +83,6 @@ const analyzeImageFromUrl = async (
     }
 
     if (result.body.tagsResult) {
-        console.log('🚀 ~ result.body.tagsResult:')
-        console.log(result.body.tagsResult.values)
         for (
             let index = 0;
             index <= 3 && index < result.body.tagsResult.values.length;
@@ -200,8 +183,6 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 
     const imageData = response.data as CloudinaryResponse
 
-    console.log('✅ Cloudinary')
-
     // STEP#2 : Analyze the image with Azure Cognitive Services
 
     const azureEndpoint: string = environment.AZURE_COGNITIVE_SERVICES_ENDPOINT
@@ -228,6 +209,4 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
     )
 
     return NextResponse.json(azureAnalysis)
-
-    // STEP#3 : Send the data to Dataiku (To do on an other ticket)
 }

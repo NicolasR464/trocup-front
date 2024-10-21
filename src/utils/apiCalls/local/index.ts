@@ -2,6 +2,7 @@ import { localInstance } from '@/utils/axiosInstances/local'
 import { apiEndpoints } from '@/utils/constants/endpoints'
 
 import type { AxiosResponse } from 'axios'
+import { ProductDataParams } from './mutations'
 
 export type ImageAnalysis = {
     brand: string
@@ -10,11 +11,6 @@ export type ImageAnalysis = {
     category: string
     subCategory: string
     state: string
-}
-
-export type ProductAnalysis = {
-    productName: string
-    productEstimation: number
 }
 
 /**
@@ -31,12 +27,17 @@ export type ImageAnalysisSuccess = {
 
 export type ImageAnalysisResponse = ImageAnalysisSuccess | AnalysisError
 
-export type ProductAnalysisSuccess = {
-    message: string
-    content: ProductAnalysis
+export type ProductAnalysisResponse = {
+    productName: string
+    productEstimation: number
 }
 
-export type ProductAnalysisResponse = ProductAnalysisSuccess | AnalysisError
+// export type ProductAnalysisSuccess = {
+//     message: string
+//     content: ProductAnalysis
+// }
+
+// export type ProductAnalysisResponse = ProductAnalysisSuccess | AnalysisError
 
 /**
  * Store and analyze an image by sending it to the local instance.
@@ -63,7 +64,7 @@ export const analyzeImage = async (
  * @throws {Error} If the image analysis fails.
  */
 export const analyzeProductData = async (
-    formData: FormData,
+    formData: ProductDataParams,
 ): Promise<ProductAnalysisResponse> => {
     const response: AxiosResponse<ProductAnalysisResponse> =
         await localInstance.postForm(apiEndpoints.PRODUCT_ANALYSIS, {

@@ -8,13 +8,14 @@ import type { Article } from '@/types/article'
 type ArticleStore = {
     analysedImage: ImageAnalysis
     article: Partial<Article>
+    openConfirmDialog: boolean
     setAnalyzedImage: (analysedImage: ImageAnalysis) => void
     setArticle: (article: Partial<Article>) => void
+    setOpenConfirmDialog: (open: boolean) => void
 }
 
 /**
- * This store is used to manage article data, including analysedImage and article details.
- * It provides a method to update the analysed image data.
+ * This store is used to manage article data, including the analysed image data and article details.
  */
 export const useArticleStore = create<ArticleStore>()(
     immer((set) => ({
@@ -27,6 +28,7 @@ export const useArticleStore = create<ArticleStore>()(
             state: '',
         },
         article: {},
+        openConfirmDialog: false,
 
         setAnalyzedImage: (analysedImage: ImageAnalysis): void => {
             set((state) => {
@@ -37,6 +39,12 @@ export const useArticleStore = create<ArticleStore>()(
         setArticle: (article: Partial<Article>): void => {
             set((state) => {
                 state.article = article
+            })
+        },
+
+        setOpenConfirmDialog: (open: boolean): void => {
+            set((state) => {
+                state.openConfirmDialog = open
             })
         },
     })),

@@ -22,6 +22,6 @@ export const POST = async (request: Request): Promise<NextResponse> => {
 
     return NextResponse.json({
         message: 'Product data analyzed successfully.',
-        content: { estimatedValue: 100 },
+        content: { estimatedValue: Math.floor(Math.random() * 100) },
     })
 }

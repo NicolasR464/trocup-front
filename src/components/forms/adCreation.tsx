@@ -1,7 +1,6 @@
 /* eslint-disable react/jsx-handler-names */
 'use client'
 import React, { useEffect, useState } from 'react'
-import type { FieldErrors } from 'react-hook-form'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -39,9 +38,8 @@ import { cn } from '@/components/shadcn/utils'
 
 import { useArticleStore } from '@/stores/article'
 import { useUserStore } from '@/stores/user'
-import {
+import type {
     ImageAnalysis,
-    ImageAnalysisResponse,
     ProductAnalysisResponse,
 } from '@/utils/apiCalls/local'
 import { useProductDataAnalysis } from '@/utils/apiCalls/local/mutations'
@@ -102,6 +100,12 @@ const ArticleForm = (): React.JSX.Element => {
     )
     const analyzedImage = useArticleStore((state) => state.analysedImage)
 
+    const setArticle = useArticleStore((state) => state.setArticle)
+
+    const setOpenConfirmDialog = useArticleStore(
+        (state) => state.setOpenConfirmDialog,
+    )
+
     const form = useForm<ArticleFormData>({
         resolver: zodResolver(ArticleFormDataSchema),
         defaultValues: {
@@ -152,7 +156,6 @@ const ArticleForm = (): React.JSX.Element => {
     const savedUserAddressLabelWatch = watch('savedUserAddressLabel')
     const addressInputWatch = watch('addressInput')
     const newAddressObjectWatch = watch('newAddressObject')
-    // const registeredAddressObjectWatch = watch('registeredAddressObject')
     const categoryWatch = watch('category')
     const subCategoryWatch = watch('subCategory')
     const stateWatch = watch('state')
@@ -228,10 +231,15 @@ const ArticleForm = (): React.JSX.Element => {
         await mutateProductAnalysis(
             { formData: articleData },
             {
-                onSuccess: (result) => {
+                onSuccess: (result: ProductAnalysisResponse) => {
                     console.log('🔥 mutateProductAnalysis onSuccess', result)
 
-                    setAnalyzedProduct(result)
+                    setArticle({
+                        ...articleData,
+                        price: result.content.estimatedValue,
+                    })
+
+                    setOpenConfirmDialog(true)
                 },
 
                 onError: (error) => {
@@ -239,19 +247,6 @@ const ArticleForm = (): React.JSX.Element => {
                 },
             },
         )
-    }
-
-    /**
-     * Handles form validation errors.
-     *
-     * This function is called when form validation fails. It logs the validation errors
-     * to the console for debugging purposes.
-     * @param {FieldErrors<UserRegistration>} errors - The validation errors object
-     * @returns {void}
-     */
-    const onError = (errors: FieldErrors<ArticleFormData>): void => {
-        console.error('onError')
-        console.log(errors)
     }
 
     /**
@@ -287,7 +282,7 @@ const ArticleForm = (): React.JSX.Element => {
     return (
         <Form {...form}>
             <form
-                onSubmit={handleSubmit(onSubmit, onError)}
+                onSubmit={handleSubmit(onSubmit)}
                 className='mx-auto max-w-4xl space-y-8 rounded-lg bg-white p-6 shadow-md'
             >
                 <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>

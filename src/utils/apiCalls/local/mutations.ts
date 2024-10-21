@@ -14,7 +14,7 @@ type UploadImageParams = {
     file: File
 }
 
-type ProductDataParams = {
+export type ProductDataParams = {
     formData: Partial<Article> & {
         analysedImageData?: Partial<ImageAnalysis>
     }
@@ -35,8 +35,8 @@ export const useImageAnalysis = (): UseMutationResult<
 }
 
 /**
- * Custom hook for storing and analyzing the content of an image using React Query's useMutation.
- * @returns {UseMutationResult} A mutation result object for storing and analyzing an image with Cloudinary and Azure Cognitive Services.
+ * Custom hook for analyzing the content of the product using React Query's useMutation.
+ * @returns {UseMutationResult} A mutation result object for sending back the product analysis and value.
  */
 export const useProductDataAnalysis = (): UseMutationResult<
     ProductAnalysisResponse,
@@ -44,6 +44,6 @@ export const useProductDataAnalysis = (): UseMutationResult<
     ProductDataParams
 > => {
     return useMutation<ProductAnalysisResponse, Error, ProductDataParams>({
-        mutationFn: ({ formData }) => analyzeProductData(formData),
+        mutationFn: (formData) => analyzeProductData(formData),
     })
 }
