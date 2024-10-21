@@ -7,7 +7,6 @@ import { DropZone } from 'react-aria-components'
 import Image from 'next/image'
 
 import { useArticleStore } from '@/stores/article'
-import type { ImageAnalysisSuccess } from '@/utils/apiCalls/local'
 import { useImageAnalysis } from '@/utils/apiCalls/local/mutations'
 
 import { Button } from '../shadcn/ui/button'
@@ -20,9 +19,6 @@ const getImageBlob = async (data: FileDropItem): Promise<File> => {
 const ImageProcessing = (): React.JSX.Element => {
     const [image, setImage] = useState<string>('')
     const [isDragging, setIsDragging] = useState(false)
-    const [objectData, setObjectData] = useState<
-        ImageAnalysisSuccess | undefined
-    >()
 
     const { mutateAsync, isPending } = useImageAnalysis()
 
@@ -44,9 +40,6 @@ const ImageProcessing = (): React.JSX.Element => {
             {
                 onSuccess: (data) => {
                     if ('content' in data) {
-                        setObjectData(data)
-
-                        // Store data in the store
                         setAnalyzedImage(data.content)
                     }
                 },
@@ -127,20 +120,6 @@ const ImageProcessing = (): React.JSX.Element => {
             </DropZone>
 
             {!!isPending && <p>{'Analyse en cours…'}</p>}
-
-            {/* {!!objectData && !isPending && (
-                <div>
-                    {!!objectData.content.objectIdentified && (
-                        <p>{`Objet: ${objectData.content.objectIdentified}`}</p>
-                    )}
-                    {!!objectData.content.brand && (
-                        <p>{`Marque: ${objectData.content.brand}`}</p>
-                    )}
-                    {objectData.content.tags.length > 0 && (
-                        <p>{`Catégories: ${objectData.content.tags.join(', ')}`}</p>
-                    )}
-                </div>
-            )} */}
         </div>
     )
 }

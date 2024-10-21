@@ -1,4 +1,8 @@
-import type { AnalysisResponse } from './index'
+import type {
+    ImageAnalysis,
+    ImageAnalysisResponse,
+    ProductAnalysisResponse,
+} from './index'
 
 import type { Article } from '@/types/article'
 
@@ -11,7 +15,9 @@ type UploadImageParams = {
 }
 
 type ProductDataParams = {
-    formData: Partial<Article>
+    formData: Partial<Article> & {
+        analysedImageData?: Partial<ImageAnalysis>
+    }
 }
 
 /**
@@ -19,11 +25,11 @@ type ProductDataParams = {
  * @returns {UseMutationResult} A mutation result object for storing and analyzing an image with Cloudinary and Azure Cognitive Services.
  */
 export const useImageAnalysis = (): UseMutationResult<
-    AnalysisResponse,
+    ImageAnalysisResponse,
     Error,
     UploadImageParams
 > => {
-    return useMutation<AnalysisResponse, Error, UploadImageParams>({
+    return useMutation<ImageAnalysisResponse, Error, UploadImageParams>({
         mutationFn: ({ file }) => analyzeImage(file),
     })
 }
@@ -33,11 +39,11 @@ export const useImageAnalysis = (): UseMutationResult<
  * @returns {UseMutationResult} A mutation result object for storing and analyzing an image with Cloudinary and Azure Cognitive Services.
  */
 export const useProductDataAnalysis = (): UseMutationResult<
-    AnalysisResponse,
+    ProductAnalysisResponse,
     Error,
     ProductDataParams
 > => {
-    return useMutation<AnalysisResponse, Error, ProductDataParams>({
+    return useMutation<ProductAnalysisResponse, Error, ProductDataParams>({
         mutationFn: ({ formData }) => analyzeProductData(formData),
     })
 }

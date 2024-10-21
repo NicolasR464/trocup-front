@@ -17,15 +17,26 @@ export type ProductAnalysis = {
     productEstimation: number
 }
 
-export type AnalysisSuccess = {
-    message: string
-    content: ImageAnalysis | ProductAnalysis
-}
+/**
+ * Error type for both image analysis and product analysis
+ */
 export type AnalysisError = {
     error: string
 }
 
-export type AnalysisResponse = AnalysisSuccess | AnalysisError
+export type ImageAnalysisSuccess = {
+    message: string
+    content: ImageAnalysis
+}
+
+export type ImageAnalysisResponse = ImageAnalysisSuccess | AnalysisError
+
+export type ProductAnalysisSuccess = {
+    message: string
+    content: ProductAnalysis
+}
+
+export type ProductAnalysisResponse = ProductAnalysisSuccess | AnalysisError
 
 /**
  * Store and analyze an image by sending it to the local instance.
@@ -33,8 +44,10 @@ export type AnalysisResponse = AnalysisSuccess | AnalysisError
  * @returns {Promise<AnalysisResponse>} A promise that resolves to the analysis response.
  * @throws {Error} If the image analysis fails.
  */
-export const analyzeImage = async (file: File): Promise<AnalysisResponse> => {
-    const response: AxiosResponse<AnalysisResponse> =
+export const analyzeImage = async (
+    file: File,
+): Promise<ImageAnalysisResponse> => {
+    const response: AxiosResponse<ImageAnalysisResponse> =
         await localInstance.postForm(apiEndpoints.IMAGE_ANALYSIS, { file })
 
     if (response.status !== 200)
@@ -51,8 +64,8 @@ export const analyzeImage = async (file: File): Promise<AnalysisResponse> => {
  */
 export const analyzeProductData = async (
     formData: FormData,
-): Promise<AnalysisResponse> => {
-    const response: AxiosResponse<AnalysisResponse> =
+): Promise<ProductAnalysisResponse> => {
+    const response: AxiosResponse<ProductAnalysisResponse> =
         await localInstance.postForm(apiEndpoints.PRODUCT_ANALYSIS, {
             formData,
         })

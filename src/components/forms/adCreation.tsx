@@ -39,6 +39,11 @@ import { cn } from '@/components/shadcn/utils'
 
 import { useArticleStore } from '@/stores/article'
 import { useUserStore } from '@/stores/user'
+import {
+    ImageAnalysis,
+    ImageAnalysisResponse,
+    ProductAnalysisResponse,
+} from '@/utils/apiCalls/local'
 import { useProductDataAnalysis } from '@/utils/apiCalls/local/mutations'
 import { getAddressSuggestions } from '@/utils/apiCalls/thirdPartyApis/addressSuggestions'
 import {
@@ -51,7 +56,7 @@ import {
 } from '@/utils/constants/productValues'
 
 import type { AddressSuggestion } from '@/types/address/gouvApiCall'
-import type { Article } from '@/types/article'
+import type { Article, DeliveryType } from '@/types/article'
 import { DeliveryTypeSchema, StateSchema, StatusSchema } from '@/types/article'
 import type { ArticleFormData } from '@/types/formValidations/adCreation'
 import {
@@ -78,11 +83,18 @@ const ArticleForm = (): React.JSX.Element => {
     const [newAddressOpen, setNewAddressOpen] = useState(false)
     const [isManufactureDateOpen, setIsManufactureDateOpen] = useState(false)
     const [isPurchaseDateOpen, setIsPurchaseDateOpen] = useState(false)
-    const [analyzedProduct, setAnalyzedProduct] = useState()
+    const [analyzedProduct, setAnalyzedProduct] = useState<
+        ProductAnalysisResponse | undefined
+    >()
 
+    // Extra CSS
     const addressInputClass = 'w-full sm:w-[420px]'
 
-    const { mutateAsync, isPending } = useProductDataAnalysis()
+    // React Query mutations
+    const {
+        mutateAsync: mutateProductAnalysis,
+        isPending: isProductAnalysisPending,
+    } = useProductDataAnalysis()
 
     // Data stored in Zustand stores
     const { address: storedAddresses, isPremium } = useUserStore(
@@ -140,9 +152,11 @@ const ArticleForm = (): React.JSX.Element => {
     const savedUserAddressLabelWatch = watch('savedUserAddressLabel')
     const addressInputWatch = watch('addressInput')
     const newAddressObjectWatch = watch('newAddressObject')
+    // const registeredAddressObjectWatch = watch('registeredAddressObject')
     const categoryWatch = watch('category')
     const subCategoryWatch = watch('subCategory')
     const stateWatch = watch('state')
+
     // Reset on image change
     useEffect(() => {
         reset()
@@ -165,7 +179,7 @@ const ArticleForm = (): React.JSX.Element => {
     /**
      * Handles the form submission.
      * @param {ArticleFormData} data - The form data to be submitted
-     * @returns {void}
+     * @returns {Promise<void>}
      */
     const onSubmit = async (data: ArticleFormData): Promise<void> => {
         if (
@@ -178,31 +192,50 @@ const ArticleForm = (): React.JSX.Element => {
             setError('addressInput', {
                 message: 'Tu dois choisir une adresse',
             })
+
+            return
         }
 
-        const articleData: Partial<Article> = {
+        const articleData: Partial<Article> & {
+            analysedImageData: ImageAnalysis
+        } = {
+            analysedImageData: analyzedImage,
             adTitle: data.adTitle,
-            brand: data.brand,
-            model: data.model,
+            ...(data.brand && { brand: data.brand }),
+            ...(data.model && { model: data.model }),
             description: data.description,
-            manufactureDate: data.manufactureDate,
-            purchaseDate: data.purchaseDate,
+            deliveryType: data.deliveryType as DeliveryType,
+            ...(data.manufactureDate && {
+                manufactureDate: data.manufactureDate,
+            }),
+            ...(data.purchaseDate && { purchaseDate: data.purchaseDate }),
             state: StateSchema.Enum[
                 data.state as keyof typeof StateSchema.Enum
             ],
             category: data.category,
             subCategory: data.subCategory,
-            size: data.size,
-            dimensions: data.dimensions,
+            // eslint-disable-next-line unicorn/explicit-length-check
+            ...(data.size && { size: data.size }),
+            ...(data.dimensions && { dimensions: data.dimensions }),
+            ...(data.registeredAddressObject.label && {
+                address: data.registeredAddressObject,
+            }),
+            ...(data.newAddressObject.label && {
+                address: data.newAddressObject,
+            }),
         }
-        /** @TODO : send the data to the API */
-        await mutateAsync(
+
+        await mutateProductAnalysis(
             { formData: articleData },
             {
                 onSuccess: (result) => {
-                    if (result) {
-                        setAnalyzedProduct(result)
-                    }
+                    console.log('🔥 mutateProductAnalysis onSuccess', result)
+
+                    setAnalyzedProduct(result)
+                },
+
+                onError: (error) => {
+                    console.error('❌ mutateProductAnalysis error', error)
                 },
             },
         )
@@ -360,7 +393,7 @@ const ArticleForm = (): React.JSX.Element => {
                     />
 
                     {/* Subcategory Select */}
-                    {JSON.stringify(subCategoryWatch)}
+
                     <FormField
                         control={control}
                         name='subCategory'
@@ -784,6 +817,24 @@ const ArticleForm = (): React.JSX.Element => {
                                                         addressObjectEmpty,
                                                     )
 
+                                                    console.log(
+                                                        '🔥 value',
+                                                        value,
+                                                    )
+
+                                                    const parsedValue =
+                                                        JSON.parse(value)
+
+                                                    console.log(
+                                                        '🔥 parsedValue',
+                                                        parsedValue,
+                                                    )
+
+                                                    setValue(
+                                                        'registeredAddressObject',
+                                                        parsedValue,
+                                                    )
+
                                                     field.onChange(value)
                                                 }}
                                                 value={field.value ?? ''}
@@ -830,6 +881,11 @@ const ArticleForm = (): React.JSX.Element => {
                                                         setValue(
                                                             'savedUserAddressLabel',
                                                             undefined,
+                                                        )
+
+                                                        setValue(
+                                                            'registeredAddressObject',
+                                                            addressObjectEmpty,
                                                         )
                                                     }}
                                                 />
@@ -980,6 +1036,11 @@ const ArticleForm = (): React.JSX.Element => {
                                                                         setValue(
                                                                             'savedUserAddressLabel',
                                                                             undefined,
+                                                                        )
+
+                                                                        setValue(
+                                                                            'registeredAddressObject',
+                                                                            addressObjectEmpty,
                                                                         )
                                                                     }}
                                                                 >

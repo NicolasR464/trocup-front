@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
 import { AddressSuggestionSchema } from '@/types/address/gouvApiCall'
-import { Address, AddressSchema } from '@/types/address/userAddress'
+import type { Address } from '@/types/address/userAddress'
+import { AddressSchema } from '@/types/address/userAddress'
 import { ArticleSchema } from '@/types/article'
 
 /**
