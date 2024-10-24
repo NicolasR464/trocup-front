@@ -81,9 +81,6 @@ const ArticleForm = (): React.JSX.Element => {
     const [newAddressOpen, setNewAddressOpen] = useState(false)
     const [isManufactureDateOpen, setIsManufactureDateOpen] = useState(false)
     const [isPurchaseDateOpen, setIsPurchaseDateOpen] = useState(false)
-    const [analyzedProduct, setAnalyzedProduct] = useState<
-        ProductAnalysisResponse | undefined
-    >()
 
     // Extra CSS
     const addressInputClass = 'w-full sm:w-[420px]'
@@ -185,6 +182,8 @@ const ArticleForm = (): React.JSX.Element => {
      * @returns {Promise<void>}
      */
     const onSubmit = async (data: ArticleFormData): Promise<void> => {
+        console.log('🔥 data', data)
+
         if (
             !data.newAddressObject.label &&
             !data.registeredAddressObject.label
@@ -202,21 +201,24 @@ const ArticleForm = (): React.JSX.Element => {
         const articleData: Partial<Article> & {
             analysedImageData: ImageAnalysis
         } = {
-            analysedImageData: analyzedImage,
             adTitle: data.adTitle,
-            ...(data.brand && { brand: data.brand }),
-            ...(data.model && { model: data.model }),
+            brand: data.brand,
+            model: data.model,
             description: data.description,
-            deliveryType: data.deliveryType as DeliveryType,
+            status: data.status,
+            state: StateSchema.Enum[
+                data.state as keyof typeof StateSchema.Enum
+            ],
             ...(data.manufactureDate && {
                 manufactureDate: data.manufactureDate,
             }),
             ...(data.purchaseDate && { purchaseDate: data.purchaseDate }),
-            state: StateSchema.Enum[
-                data.state as keyof typeof StateSchema.Enum
-            ],
+            analysedImageData: analyzedImage,
+            ...(data.brand && { brand: data.brand }),
+            ...(data.model && { model: data.model }),
             category: data.category,
             subCategory: data.subCategory,
+            deliveryType: data.deliveryType as DeliveryType,
             // eslint-disable-next-line unicorn/explicit-length-check
             ...(data.size && { size: data.size }),
             ...(data.dimensions && { dimensions: data.dimensions }),
@@ -237,6 +239,7 @@ const ArticleForm = (): React.JSX.Element => {
                     setArticle({
                         ...articleData,
                         price: result.content.estimatedValue,
+                        imageUrls: [analyzedImage.imageUrl],
                     })
 
                     setOpenConfirmDialog(true)
@@ -893,6 +896,7 @@ const ArticleForm = (): React.JSX.Element => {
                         </div>
                     )}
 
+                    {JSON.stringify(newAddressObjectWatch)}
                     {/** Article Address Input */}
                     <div className='mt-[9px] flex justify-center'>
                         <FormField
@@ -1131,6 +1135,7 @@ const ArticleForm = (): React.JSX.Element => {
                 </div>
                 <div className='flex justify-center'>
                     <Button
+                        disabled={isProductAnalysisPending}
                         type='submit'
                         className='w-full md:w-auto'
                     >

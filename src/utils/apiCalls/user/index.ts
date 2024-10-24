@@ -55,7 +55,7 @@ export const createUser = async (
 ): Promise<CreateUserResponse> => {
     if (!JWT) throw new Error('No JWT provided')
 
-    addAuthHeader(JWT)
+    addAuthHeader(userInstance, JWT)
 
     const response: AxiosResponse<CreateUserResponse> = await userInstance.post(
         apiEndpoints.USERS,

@@ -1,10 +1,12 @@
+import type { ProductDataParams } from './mutations'
+
 import { localInstance } from '@/utils/axiosInstances/local'
 import { apiEndpoints } from '@/utils/constants/endpoints'
 
 import type { AxiosResponse } from 'axios'
-import { ProductDataParams } from './mutations'
 
 export type ImageAnalysis = {
+    imageUrl: string
     brand: string
     tags: string[]
     objectIdentified: string
@@ -13,31 +15,20 @@ export type ImageAnalysis = {
     state: string
 }
 
-/**
- * Error type for both image analysis and product analysis
- */
-export type AnalysisError = {
-    error: string
-}
-
-export type ImageAnalysisSuccess = {
+export type ImageAnalysisResponse = {
     message: string
     content: ImageAnalysis
 }
 
-export type ImageAnalysisResponse = ImageAnalysisSuccess | AnalysisError
-
-export type ProductAnalysisResponse = {
+export type ProductAnalysis = {
     productName: string
-    productEstimation: number
+    estimatedValue: number
 }
 
-// export type ProductAnalysisSuccess = {
-//     message: string
-//     content: ProductAnalysis
-// }
-
-// export type ProductAnalysisResponse = ProductAnalysisSuccess | AnalysisError
+export type ProductAnalysisResponse = {
+    message: string
+    content: ProductAnalysis
+}
 
 /**
  * Store and analyze an image by sending it to the local instance.

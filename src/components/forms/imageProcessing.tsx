@@ -20,7 +20,7 @@ const ImageProcessing = (): React.JSX.Element => {
     const [image, setImage] = useState<string>('')
     const [isDragging, setIsDragging] = useState(false)
 
-    const { mutateAsync, isPending } = useImageAnalysis()
+    const { mutateAsync: mutateImageAnalysis, isPending } = useImageAnalysis()
 
     // This state is used to track if the image has been loaded
     const [imageLoaded, setImageLoaded] = useState(false)
@@ -35,7 +35,7 @@ const ImageProcessing = (): React.JSX.Element => {
 
         setImage(imageUrl)
 
-        await mutateAsync(
+        await mutateImageAnalysis(
             { file },
             {
                 onSuccess: (data) => {

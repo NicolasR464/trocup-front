@@ -20,6 +20,7 @@ type ArticleStore = {
 export const useArticleStore = create<ArticleStore>()(
     immer((set) => ({
         analysedImage: {
+            imageUrl: '',
             brand: '',
             tags: [],
             objectIdentified: '',

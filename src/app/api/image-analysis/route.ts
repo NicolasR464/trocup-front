@@ -5,7 +5,7 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
-import type { ImageAnalysisSuccess } from '@/utils/apiCalls/local'
+import type { ImageAnalysisResponse } from '@/utils/apiCalls/local'
 import { apiEndpoints } from '@/utils/constants/endpoints'
 import { mainFolder, subfolders } from '@/utils/constants/images'
 import { categoriesList, products } from '@/utils/constants/productValues'
@@ -29,7 +29,7 @@ const analyzeImageFromUrl = async (
     client: ImageAnalysisClient,
     imageUrl: string,
     features: string[],
-): Promise<ImageAnalysisSuccess> => {
+): Promise<ImageAnalysisResponse> => {
     const result: AnalyzeFromUrl200Response | AnalyzeFromUrlDefaultResponse =
         await client.path('/imageanalysis:analyze').post({
             body: {
@@ -42,11 +42,11 @@ const analyzeImageFromUrl = async (
         })
 
     if (isUnexpected(result)) {
-        throw result.body.error
+        throw new Error(result.body.error)
     }
 
     let brand = ''
-    let objectIdentified: string | undefined = ''
+    let objectIdentified = ''
     const tags: string[] = []
     let category = ''
     let subCategory = ''
@@ -73,7 +73,7 @@ const analyzeImageFromUrl = async (
                     : object
         }
 
-        objectIdentified = highestConfidenceObject?.tags[0].name
+        objectIdentified = highestConfidenceObject?.tags[0].name ?? ''
     }
 
     // Read the text from the image - and extract the brand name
@@ -127,9 +127,10 @@ const analyzeImageFromUrl = async (
     }
 
     const objectData = {
+        imageUrl,
         brand,
-        objectIdentified,
         tags,
+        objectIdentified,
         category,
         subCategory,
         state,
